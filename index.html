@@ -19,12 +19,10 @@
 
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
   <script src="init.js"></script>
-  
+
   <script type="text/javascript">
 
-    /**
-     * Handles the sign in button press.
-     */
+    /*
     function toggleSignIn() {
       if (firebase.auth().currentUser) {
         // [START signout]
@@ -62,9 +60,7 @@
       document.getElementById('quickstart-sign-in').disabled = true;
     }
 
-    /**
-     * Handles the sign up button press.
-     */
+
     function handleSignUp() {
       var email = document.getElementById('email').value;
       var password = document.getElementById('password').value;
@@ -94,9 +90,7 @@
       // [END createwithemail]
     }
 
-    /**
-     * Sends an email verification to the user.
-     */
+
     function sendEmailVerification() {
       // [START sendemailverification]
       firebase.auth().currentUser.sendEmailVerification().then(function() {
@@ -131,13 +125,20 @@
       });
       // [END sendpasswordemail];
     }
-	
-    /**
-     * initApp handles setting up UI event listeners and registering Firebase auth listeners:
-     *  - firebase.auth().onAuthStateChanged: This listener is called when the user is signed in or
-     *    out, and that is where we update the UI.
-     */
+	  */
+
     function initApp() {
+
+      var database = firebase.database();
+
+      if(database != null){
+        alert("資料庫有東西!!");
+      }
+      else{
+        alert("資料沒東西...");
+      }
+
+      /*
       // Listening for auth state changes.
       // [START authstatelistener]
       firebase.auth().onAuthStateChanged(function(user) {
@@ -162,7 +163,7 @@
           }
           // [END_EXCLUDE]
 		  window.location.href = "page2.html";
-		  
+
         } else {
           // User is signed out.
           // [START_EXCLUDE]
@@ -180,8 +181,11 @@
       document.getElementById('quickstart-sign-up').addEventListener('click', handleSignUp, false);
       document.getElementById('quickstart-verify-email').addEventListener('click', sendEmailVerification, false);
       document.getElementById('quickstart-password-reset').addEventListener('click', sendPasswordReset, false);
+      */
 
     }
+
+
 
     window.onload = function() {
       initApp();
@@ -222,7 +226,7 @@
           <button class="mdl-button mdl-js-button mdl-button--raised" disabled id="quickstart-verify-email" name="verify-email">Send Email Verification</button>
           &nbsp;&nbsp;&nbsp;
           <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-password-reset" name="verify-email">Send Password Reset Email</button>
-		  
+
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
             Firebase sign-in status: <span id="quickstart-sign-in-status">Unknown</span>
