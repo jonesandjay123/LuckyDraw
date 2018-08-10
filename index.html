@@ -90,6 +90,24 @@
       }
     };
 
+    //讀取資料庫中的清單
+    var getListFromDB = function(){
+
+      var database = firebase.database();
+      if(database != null){
+        alert("已連線到firebase!");
+
+        var scoresRef = firebase.database().ref("工作表");
+        console.log("scoresRef: "+scoresRef);
+
+        //在這裡撈取工作表的清單...
+
+      }
+      else{
+        alert("沒有連線到firebase...");
+      }
+    }
+
     window.onload = function() {
       initApp();
     };
@@ -123,7 +141,8 @@
           <button onclick="getExcelContent()">讀取檔案</button>
           <output id="out"></output>
           <br/><br/>
-
+          <button onclick="getListFromDB()">讀取資料庫清單</button>
+          <br/><br/>
 
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="email" name="email" placeholder="Email"/>
           &nbsp;&nbsp;&nbsp;
