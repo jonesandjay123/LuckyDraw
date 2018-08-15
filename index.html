@@ -164,6 +164,23 @@
         return;
       }
 
+      var dataExits = false; //比對用的flag
+
+      //去資料庫中比對要輸入的名子是否已存在
+      firebase.database().ref("users").on('value', snap => {
+
+       snap.forEach(function(data) {
+             console.log("標題: " + data.key + "     內容:"+data.val().name);
+
+             if(data.val().name == empName){
+               dataExits = true;
+             }
+       });
+     });
+
+     console.log("比對結果: "+dataExits);
+
+
       switch (type) {
         case "add":
           if(empName == null || empName == ""){
@@ -190,6 +207,18 @@
     //寫入員工資料
     function addEmpData(empNO, empName){
       console.log("empNO: "+empNO + "   empName: "+empName );
+
+
+
+      /*
+      firebase.database().ref("users/"+"2").set({
+        name: empName,
+        email: empNO,
+        age: 10,
+        location: "Japan",
+        age_location: "10_Japan"
+      });
+      */
     }
 
 
