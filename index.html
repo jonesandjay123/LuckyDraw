@@ -26,6 +26,68 @@
 
   <script type="text/javascript">
 
+  /*
+  //取得table中的全部資料(寫法B)
+  userList.orderByValue().on("value", function(snap){
+
+    console.log(snap.val());
+    console.log("長度為: "+Object.size(snap.val())  );
+
+    // snap.forEach(function(data){
+    //     console.log("標題: " + data.key + "     內容:"+data.val());
+    // });
+
+  });
+
+  //取的table中的第一組數據
+  var ul1 = userList.child('1');
+  //類比where條件來查物件
+  var q1 = userList.orderByChild("email").equalTo("vivien@gmail.com");
+
+  //針對單一key
+  // ul1.on('value', function(snapshot) {
+  //     console.log(snapshot.val().name);
+  // });
+
+  //撈取特定物件底下的key跟value
+  ul1.orderByValue().on("value", function(snapshot) {
+      snapshot.forEach(function(data) {
+            console.log("標題: " + data.key + "     內容:"+data.val());
+
+            //再往下撈...
+            // for(var i in parsedData){
+            //   console.log(i + ":" + parsedData[i]); //alerts key's value
+            // }
+
+      });
+    });
+
+
+  console.log("q1.getQueryParams: "+ q1.getQueryParams());
+
+  var resObj =  q1.getQueryParams();
+
+  for(var i in resObj){
+        //console.log(i + ":" + scoresRef[i]); //alerts key's value
+        console.log(i);
+  }
+
+  console.log(scoresRef.getQueryParams());
+  console.log(scoresRef.getKey());
+  console.log(scoresRef.orderByValue());
+
+  var query = scoresRef.orderByValue();
+  query.on('value', snap => {
+    console.log(snap);
+  });
+
+
+  //console.log("scoresRef: "+result);
+
+  //在這裡撈取工作表的清單...
+  */
+
+
     //頁面載入時檢查是否有連到firebase
     function initApp() {
 
@@ -33,10 +95,11 @@
 
       if(database != null){
         console.log("===已和firebase取得連線===");
-        //console.log(database);
+        document.getElementById("connection-status").innerHTML = "已連線";
       }
       else{
         alert("沒有連線到firebase...");
+        document.getElementById("connection-status").innerHTML = "連線失敗";
       }
     }
 
@@ -90,18 +153,54 @@
       }
     };
 
-    //讀取資料庫中的清單
-    var getListFromDB = function(){
+    //三個按鈕共用的參數驗證區塊
+    function sendInput(type){
 
-      var database = firebase.database();
-      if(database != null){
-        alert("已連線到firebase!");
+      var empNO = document.getElementById("empNO").value.trim();
+      var empName = document.getElementById("empName").value.trim();
+
+      if(empNO == null || empNO == ""){
+        alert("未填寫員工編號~");
+        return;
+      }
+
+      switch (type) {
+        case "add":
+          if(empName == null || empName == ""){
+            alert("未填寫員工姓名~");
+            return;
+          }
+          console.log("走新增");
+          addEmpData(empNO, empName);
+          break;
+
+        case "edit":
+          if(empName == null || empName == ""){
+            alert("未填寫員工姓名~");
+            return;
+          }
+          console.log("走編輯");
+          break;
+
+        default:
+          console.log("走刪除");
+      }
+    }
+
+    //寫入員工資料
+    function addEmpData(empNO, empName){
+      console.log("empNO: "+empNO + "   empName: "+empName );
+    }
+
+
+
+    //繪製人員清單的table
+    function drawNameTable(database){
+
+      try {
 
         var workSheet = firebase.database().ref("工作表");
         var userList = firebase.database().ref("users")
-
-
-        console.log("------------------------------");
 
         //取得table中的全部資料(寫法A)
         var query = workSheet.orderByValue();
@@ -112,78 +211,63 @@
 
           var parsedData =snap.val();
 
+          var nTable = document.getElementById("nameTable");
+
+          //每次繪製前，先把Table的第一行以外的內容清空
+          for(var i = 1; i < nTable.rows.length;){
+              nTable.deleteRow(i);
+          }
+
+          var tbody = document.createElement("tbody");
+
           for(var i in parsedData){
-            console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
+            //console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
+
+            //創建TR
+            var tr = document.createElement("tr");
+
+            //第一個TD
+            var td1 = document.createElement("td");
+            var txt1 = document.createTextNode(parsedData[i]["員工編號"]);
+            td1.appendChild(txt1);
+            tr.appendChild(td1);
+            //第二個TD
+            var td2 = document.createElement("td");
+            var txt2 = document.createTextNode(parsedData[i]["姓名"]);
+            td2.appendChild(txt2);
+            tr.appendChild(td2);
+            //第三個TD
+            var td3 = document.createElement("td");
+            var txt3 = document.createTextNode("true");
+            td3.appendChild(txt3);
+            tr.appendChild(td3);
+
+            //加進tbody跟table
+            tbody.appendChild(tr);
+            nTable.appendChild(tbody);
           }
 
         });
 
+      }
+      catch(err) {
+          alert("發生錯誤: "+err.message);
+      }
 
-        /*
-        //取得table中的全部資料(寫法B)
-        userList.orderByValue().on("value", function(snap){
+    }
 
-          console.log(snap.val());
-          console.log("長度為: "+Object.size(snap.val())  );
+    //讀取資料庫中的清單
+    var getListFromDB = function(){
 
-          // snap.forEach(function(data){
-          //     console.log("標題: " + data.key + "     內容:"+data.val());
-          // });
-
-        });
-
-        //取的table中的第一組數據
-        var ul1 = userList.child('1');
-        //類比where條件來查物件
-        var q1 = userList.orderByChild("email").equalTo("vivien@gmail.com");
-
-
-        //針對單一key
-        // ul1.on('value', function(snapshot) {
-        //     console.log(snapshot.val().name);
-        // });
-
-
-        //撈取特定物件底下的key跟value
-        ul1.orderByValue().on("value", function(snapshot) {
-    			  snapshot.forEach(function(data) {
-    				      console.log("標題: " + data.key + "     內容:"+data.val());
-
-                  //再往下撈...
-                  // for(var i in parsedData){
-                  //   console.log(i + ":" + parsedData[i]); //alerts key's value
-                  // }
-
-    			  });
-    			});
-
-
-        console.log("q1.getQueryParams: "+ q1.getQueryParams());
-
-        var resObj =  q1.getQueryParams();
-
-        for(var i in resObj){
-              //console.log(i + ":" + scoresRef[i]); //alerts key's value
-              console.log(i);
-        }
-
-        console.log(scoresRef.getQueryParams());
-        console.log(scoresRef.getKey());
-        console.log(scoresRef.orderByValue());
-
-        var query = scoresRef.orderByValue();
-        query.on('value', snap => {
-          console.log(snap);
-        });
-        */
-
-        //console.log("scoresRef: "+result);
-
-        //在這裡撈取工作表的清單...
-
+      var database = firebase.database();
+      if(database != null){
+        document.getElementById("connection-status").innerHTML = "已連線";
+        drawNameTable(database);
       }
       else{
         alert("沒有連線到firebase...");
+        document.getElementById("connection-status").innerHTML = "連線失敗";
+
       }
     }
 
@@ -232,23 +316,41 @@
           <button onclick="getListFromDB()">讀取資料庫清單</button>
           <br/><br/>
 
-          <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="email" name="email" placeholder="Email"/>
+          <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empNO" placeholder="員工編號"/>
           &nbsp;&nbsp;&nbsp;
-          <input class="mdl-textfield__input" style="display:inline;width:auto;" type="password" id="password" name="password" placeholder="Password"/>
+          <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empName" placeholder="員工姓名"/>
           <br/><br/>
-          <button disabled class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in" name="signin">Sign In</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="sendInput('add')">新增</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-up" name="signup">Sign Up</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="editEMP" onclick="sendInput('edit')">修改</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" disabled id="quickstart-verify-email" name="verify-email">Send Email Verification</button>
-          &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-password-reset" name="verify-email">Send Password Reset Email</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="deleteEMP" onclick="sendInput('delete')">移除</button>
+
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
-            Firebase sign-in status: <span id="quickstart-sign-in-status">Unknown</span>
-            <div>Firebase auth <code>currentUser</code> object value:</div>
-            <pre><code id="quickstart-account-details">null</code></pre>
+            資料庫連線狀態: <span id="connection-status">Unknown</span>
+            <pre><code>
+
+              <table id="nameTable">
+                <tr>
+                  <th>工號:</th>
+                  <th>姓名:</th>
+                  <th>中獎:</th>
+                </tr>
+                <tr>
+                  <td>Jill</td>
+                  <td>Smith</td>
+                  <td>50</td>
+                </tr>
+                <tr>
+                  <td>Eve</td>
+                  <td>Jackson</td>
+                  <td>94</td>
+                </tr>
+              </table>
+
+            </code></pre>
           </div>
         </div>
       </div>
