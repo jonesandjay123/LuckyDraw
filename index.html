@@ -97,8 +97,87 @@
       if(database != null){
         alert("已連線到firebase!");
 
-        var scoresRef = firebase.database().ref("工作表");
-        console.log("scoresRef: "+scoresRef);
+        var workSheet = firebase.database().ref("工作表");
+        var userList = firebase.database().ref("users")
+
+
+        console.log("------------------------------");
+
+        //取得table中的全部資料(寫法A)
+        var query = workSheet.orderByValue();
+        query.on('value', snap => {
+          console.log(snap.val());
+
+          console.log("users的長度為: "+Object.size(snap.val()));
+
+          var parsedData =snap.val();
+
+          for(var i in parsedData){
+            console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
+          }
+
+        });
+
+
+        /*
+        //取得table中的全部資料(寫法B)
+        userList.orderByValue().on("value", function(snap){
+
+          console.log(snap.val());
+          console.log("長度為: "+Object.size(snap.val())  );
+
+          // snap.forEach(function(data){
+          //     console.log("標題: " + data.key + "     內容:"+data.val());
+          // });
+
+        });
+
+        //取的table中的第一組數據
+        var ul1 = userList.child('1');
+        //類比where條件來查物件
+        var q1 = userList.orderByChild("email").equalTo("vivien@gmail.com");
+
+
+        //針對單一key
+        // ul1.on('value', function(snapshot) {
+        //     console.log(snapshot.val().name);
+        // });
+
+
+        //撈取特定物件底下的key跟value
+        ul1.orderByValue().on("value", function(snapshot) {
+    			  snapshot.forEach(function(data) {
+    				      console.log("標題: " + data.key + "     內容:"+data.val());
+
+                  //再往下撈...
+                  // for(var i in parsedData){
+                  //   console.log(i + ":" + parsedData[i]); //alerts key's value
+                  // }
+
+    			  });
+    			});
+
+
+        console.log("q1.getQueryParams: "+ q1.getQueryParams());
+
+        var resObj =  q1.getQueryParams();
+
+        for(var i in resObj){
+              //console.log(i + ":" + scoresRef[i]); //alerts key's value
+              console.log(i);
+        }
+
+        console.log(scoresRef.getQueryParams());
+        console.log(scoresRef.getKey());
+        console.log(scoresRef.orderByValue());
+
+        var query = scoresRef.orderByValue();
+        query.on('value', snap => {
+          console.log(snap);
+        });
+        */
+
+        //console.log("scoresRef: "+result);
 
         //在這裡撈取工作表的清單...
 
@@ -107,6 +186,15 @@
         alert("沒有連線到firebase...");
       }
     }
+
+    //計算size的function
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
 
     window.onload = function() {
       initApp();
