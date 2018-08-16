@@ -153,6 +153,9 @@
       }
     };
 
+
+
+
     //三個按鈕共用的參數驗證區塊
     function sendInput(type){
 
@@ -167,14 +170,15 @@
       var dataExits = false; //比對用的flag
 
       //去資料庫中比對要輸入的名子是否已存在
-      firebase.database().ref("users").on('value', snap => {
+      firebase.database().ref("工作表").on('value', snap => {
 
        snap.forEach(function(data) {
-             console.log("標題: " + data.key + "     內容:"+data.val().name);
+             //console.log("標題: " + data.key + "     內容:"+data.val()["員工編號"]);
 
-             if(data.val().name == empName){
+             if(data.val()["員工編號"] == empNO){
                dataExits = true;
              }
+
        });
      });
 
@@ -187,6 +191,10 @@
             alert("未填寫員工姓名~");
             return;
           }
+          if(dataExits){
+            alert("員工已存在，不可在新增!");
+            return;
+          }
           console.log("走新增");
           addEmpData(empNO, empName);
           break;
@@ -196,10 +204,18 @@
             alert("未填寫員工姓名~");
             return;
           }
+          if(!dataExits){
+            alert("員工不存在，無法做修改!");
+            return;
+          }
           console.log("走編輯");
           break;
 
         default:
+          if(!dataExits){
+            alert("員工不存在，無法做刪除!");
+            return;
+          }
           console.log("走刪除");
       }
     }
@@ -214,9 +230,9 @@
       firebase.database().ref("users/"+"2").set({
         name: empName,
         email: empNO,
-        age: 10,
-        location: "Japan",
-        age_location: "10_Japan"
+        age: 26,
+        location: "Taipie",
+        age_location: "26_Taipie"
       });
       */
     }
