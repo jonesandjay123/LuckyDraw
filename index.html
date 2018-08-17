@@ -87,6 +87,65 @@
   //在這裡撈取工作表的清單...
   */
 
+  /*
+  firebase.database().ref("testDB/"+obj[1]["員工編號"]).set({
+    name: obj[1]["姓名"],
+    empNO: obj[1]["員工編號"],
+    picked: false
+  },function(error){
+    if(error){
+      alert(empNO+"的資料寫入失敗!");
+      console.log(empNO+"的資料寫入失敗! error: " + error);
+    }
+    else{
+      alert("工號:"+empNO+" 姓名:"+empName+" 資料寫入成功!");
+    }
+  });
+
+
+  var objt = new Object();
+ objt.name = "Raj";
+ objt.age  = 32;
+ objt.picked = false;
+ var jsonString= JSON.stringify(objt);
+
+ var temp = {jsonString};
+ const students = JSON.stringify(temp);
+
+ console.log(students);
+ //firebase.database().ref().update(students);
+
+
+ var docData = {
+     stringExample: "Hello world!",
+     booleanExample: true,
+     numberExample: 3.14159265,
+     dateExample: new Date("December 10, 1815"),
+     arrayExample: [5, true, "hello"],
+     nullExample: null,
+     objectExample: {
+         a: 5,
+         b: {
+             nested: "foo"
+         }
+     }
+ };
+
+  let insertObject = {
+    "testDB/020518/name" : "Jones",
+    "testDB/020518/empNO" : "020518",
+    "testDB/020518/picked" : false,
+    "testDB/080046/name" : "Vivien",
+    "testDB/080046/empNO" : "080046",
+    "testDB/080046/picked" : false
+  }
+
+  console.log(insertObject);
+  firebase.database().ref().update(insertObject);
+  */
+  //console.log(roa[1]["員工編號"]);
+
+
 
     //頁面載入時檢查是否有連到firebase
     function initApp() {
@@ -102,6 +161,29 @@
         document.getElementById("connection-status").innerHTML = "連線失敗";
       }
     }
+
+    //把攔截出來的Map物件寫入firebaseDB
+    function mapToDB(empList){
+
+      var obj = empList["工作表"];
+      console.log(obj);
+
+      for(var i in obj){
+        console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
+        //obj.keys() = obj[i]["員工編號"];
+        //console.log(obj.keys());
+      }
+
+      console.log(obj);
+
+      firebase.database().ref("testDB/").set(obj).then(function() {
+          console.log("Document successfully written!");
+      });
+
+
+
+    }
+
 
     //轉換成JSON
     function to_json(workbook) {
@@ -120,7 +202,9 @@
         var output = "";
         //這裡拿掉了Switch case只留下Json的做法
         output = JSON.stringify(to_json(wb), 2, 2);
-        console.log(output);
+
+        mapToDB(to_json(wb));  //從中將map資料拿去寫入firebaseDB
+        //console.log(output);
         if(out.innerText === undefined) out.textContent = output;
         else out.innerText = output;
     }
@@ -160,12 +244,18 @@
 
       console.log("走新增: empNO: "+empNO + "   empName: "+empName );
 
-
-      firebase.database().ref("工作表").on('value', snap => {
-
-        console.log(snap.val());
-        console.log("長度為: "+Object.size(snap.val())  );
-
+     firebase.database().ref("工作表1/"+empNO).set({
+       name: empName,
+       empNO: empNO,
+       picked: false
+     },function(error){
+       if(error){
+         alert(empNO+"的資料寫入失敗!");
+         console.log(empNO+"的資料寫入失敗! error: " + error);
+       }
+       else{
+         alert("工號:"+empNO+" 姓名:"+empName+" 資料寫入成功!");
+       }
      });
 
       /*
@@ -190,7 +280,7 @@
     }
 
     //根據執行種類(新、刪、修)工號、工單是否存在，來分配執行位置。
-    function executeAction(type, empNO, dataExits){
+    function executeAction(type, empNO, empName, dataExits){
       //console.log("在executeAction裡面的接收結果，工號:"+empNO+" 是否已存在:"+dataExits);
 
       switch (type) {
@@ -211,7 +301,7 @@
     }
 
     //進資料庫驗證工號是否存在
-    function checkIDexits(type, empNO, dataExits, callback){
+    function checkIDexits(type, empNO, empName, dataExits, callback){
 
       //去資料庫中比對要輸入的名子是否已存在
       firebase.database().ref("工作表").on('value', snap => {
@@ -226,7 +316,7 @@
        });
        //console.log("在callback方法checkIDexits裡面的驗證結果，工號:"+empNO+" 是否已存在:"+dataExits);
 
-       callback(type, empNO, dataExits); //判斷完後，將判斷完的結果callback接續執行...
+       callback(type, empNO, empName, dataExits); //判斷完後，將判斷完的結果callback接續執行...
      });
     }
 
@@ -253,7 +343,7 @@
       var dataExits = false; //比對用的flag
 
       //執行callback
-      checkIDexits(type, empNO, dataExits, executeAction);
+      checkIDexits(type, empNO, empName, dataExits, executeAction);
     }
 
 
