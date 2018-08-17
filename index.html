@@ -162,19 +162,44 @@
       }
     }
 
+
     //把攔截出來的Map物件寫入firebaseDB
     function mapToDB(empList){
 
       var obj = empList["工作表"];
       console.log(obj);
 
+      //var newObj = new Object();
+      var newObj = new Array();
+
+      /*
+     objt.name = "Raj";
+     objt.age  = 32;
+     objt.picked = false;
+     var jsonString= JSON.stringify(objt);
+
+     var temp = {jsonString};
+     const students = JSON.stringify(temp);
+     */
+
+
       for(var i in obj){
         console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
         //obj.keys() = obj[i]["員工編號"];
         //console.log(obj.keys());
+
+        // var subObj = new Object();
+        // subObj.name = obj[i]["員工編號"];
+        // subObj.empNo  = obj[i]["姓名"];
+        // subObj.picked = false;
+        // var jsonString= JSON.stringify(subObj);
+        // newObj.push(jsonString);
       }
 
+
+
       console.log(obj);
+      //console.log(obj);
 
       firebase.database().ref("testDB/").set(obj).then(function() {
           console.log("Document successfully written!");
