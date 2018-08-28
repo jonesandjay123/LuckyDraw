@@ -167,45 +167,18 @@
     function mapToDB(empList){
 
       var obj = empList["工作表"];
-      console.log(obj);
-
-      //var newObj = new Object();
-      var newObj = new Array();
-
-      /*
-     objt.name = "Raj";
-     objt.age  = 32;
-     objt.picked = false;
-     var jsonString= JSON.stringify(objt);
-
-     var temp = {jsonString};
-     const students = JSON.stringify(temp);
-     */
-
-
-      for(var i in obj){
-        console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
-        //obj.keys() = obj[i]["員工編號"];
-        //console.log(obj.keys());
-
-        // var subObj = new Object();
-        // subObj.name = obj[i]["員工編號"];
-        // subObj.empNo  = obj[i]["姓名"];
-        // subObj.picked = false;
-        // var jsonString= JSON.stringify(subObj);
-        // newObj.push(jsonString);
-      }
-
-
-
-      console.log(obj);
       //console.log(obj);
 
-      firebase.database().ref("testDB/").set(obj).then(function() {
+      //在物件中塞入一個新的欄位WON，預設值為false
+      for(var i in obj){
+        //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
+        obj[i].WON = false;
+      }
+
+      //把物件寫入資料庫
+      firebase.database().ref("users/").set(obj).then(function() {
           console.log("Document successfully written!");
       });
-
-
 
     }
 
@@ -267,31 +240,30 @@
     //寫入員工資料
     function addEmpData(empNO, empName){
 
-      console.log("走新增: empNO: "+empNO + "   empName: "+empName );
+      //console.log("走新增: empNO: "+empNO + "   empName: "+empName );
 
-     firebase.database().ref("工作表1/"+empNO).set({
-       name: empName,
-       empNO: empNO,
-       picked: false
-     },function(error){
-       if(error){
-         alert(empNO+"的資料寫入失敗!");
-         console.log(empNO+"的資料寫入失敗! error: " + error);
-       }
-       else{
-         alert("工號:"+empNO+" 姓名:"+empName+" 資料寫入成功!");
-       }
-     });
-
-      /*
-      firebase.database().ref("users/"+"2").set({
-        name: empName,
-        email: empNO,
-        age: 26,
-        location: "Taipie",
-        age_location: "26_Taipie"
+      var index = 0;
+      //撈取user底下的最下面一筆資料
+      firebase.database().ref("users").orderByValue().limitToLast(1).on("value", function(snapshot) {
+        snapshot.forEach(function(data) { index = data.key   });
       });
-      */
+      index++; //index值++就是下一筆資料的位置
+
+      firebase.database().ref("users/"+index).set({
+        "姓名": empName,
+        "員工編號": empNO,
+        WON: false
+      },function(error){
+        if(error){
+          alert(empNO+"的資料寫入失敗!");
+          console.log(empNO+"的資料寫入失敗! error: " + error);
+        }
+        else{
+          alert("工號:"+empNO+" 姓名:"+empName+" 資料寫入成功!");
+        }
+      });
+
+
     }
 
     //修改員工資料
@@ -329,7 +301,7 @@
     function checkIDexits(type, empNO, empName, dataExits, callback){
 
       //去資料庫中比對要輸入的名子是否已存在
-      firebase.database().ref("工作表").on('value', snap => {
+      firebase.database().ref("users").on('value', snap => {
 
        snap.forEach(function(data) {
              //console.log("標題: " + data.key + "     內容:"+data.val()["員工編號"]);
@@ -377,8 +349,7 @@
 
       try {
 
-        var workSheet = firebase.database().ref("工作表");
-        var userList = firebase.database().ref("users")
+        var workSheet = firebase.database().ref("users");
 
         //取得table中的全部資料(寫法A)
         var query = workSheet.orderByValue();
@@ -415,7 +386,7 @@
             tr.appendChild(td2);
             //第三個TD
             var td3 = document.createElement("td");
-            var txt3 = document.createTextNode("true");
+            var txt3 = document.createTextNode(parsedData[i].WON);
             td3.appendChild(txt3);
             tr.appendChild(td3);
 
