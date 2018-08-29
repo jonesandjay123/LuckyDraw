@@ -166,20 +166,43 @@
     //把攔截出來的Map物件寫入firebaseDB
     function mapToDB(empList){
 
-      var obj = empList["工作表"];
-      //console.log(obj);
+      //上傳人員清單
+      if(checkfileType()=="empListRadio"){
 
-      //在物件中塞入一個新的欄位WON，預設值為false
-      for(var i in obj){
-        //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
-        obj[i].WON = false;
-        obj[i].PRICE = false;
+        var obj = empList["工作表"];
+        //console.log(obj);
+
+        //在物件中塞入一個新的欄位WON，預設值為false
+        for(var i in obj){
+          //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
+          obj[i].WON = false;
+          obj[i].PRICE = false;
+        }
+
+        //把物件寫入資料庫
+        firebase.database().ref("users/").set(obj).then(function() {
+            console.log("Document successfully written!");
+            alert("人員清單上傳完畢!");
+        });
+
+      }
+      //上傳獎品清單
+      else{
+
+        var obj = empList["獎項"];
+        console.log(obj);
+        for(var i in obj){
+          obj[i].WINNER = false;
+        }
+
+        //把物件寫入資料庫
+        firebase.database().ref("priceList/").set(obj).then(function() {
+            console.log("Document successfully written!");
+            alert("獎項清單上傳完畢!");
+        });
+
       }
 
-      //把物件寫入資料庫
-      firebase.database().ref("users/").set(obj).then(function() {
-          console.log("Document successfully written!");
-      });
 
     }
 
@@ -495,7 +518,25 @@
         return size;
     };
 
+    //驗證現在選取的是哪個
+    function checkfileType(){
+      var result = document.querySelector('input[name="fileType"]:checked').value;
+      if(result == "priceListRadio"){
+        document.getElementById("empNO").placeholder = "獎項編號";
+        document.getElementById("empName").placeholder = "獎項名稱";
+        document.getElementById("updateNote").innerHTML  = "匯入的excel檔，獎項清單活頁簿名稱必須要叫做:獎項";
+      }
+      else{
+        document.getElementById("empNO").placeholder = "員工編號";
+        document.getElementById("empName").placeholder = "員工姓名";
+        document.getElementById("updateNote").innerHTML  = "匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表";
+      }
+      return result;
+    }
+
+
     window.onload = function() {
+      checkfileType();
       initApp();
       getListFromDB();
     };
@@ -522,7 +563,7 @@
           <h2 class="mdl-card__title-text">Firebase Email &amp; Password Authentication</h2>
         </div>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-          <p>匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p>
+          <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p>
 
           <div id="resultArea" style="float: right">
 
@@ -545,7 +586,11 @@
           <br/><br/>
           <button onclick="getListFromDB()">讀取資料庫清單</button>
           <br/><br/>
-
+          <form>
+            <input type="radio" name="fileType" onclick="checkfileType()" value="empListRadio">員工清單<br>
+            <input type="radio" name="fileType" onclick="checkfileType()" value="priceListRadio" checked="checked">獎項清單<br>
+          </form>
+          <br/><br/>
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empNO" placeholder="員工編號"/>
           &nbsp;&nbsp;&nbsp;
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empName" placeholder="員工姓名"/>
