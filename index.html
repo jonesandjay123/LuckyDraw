@@ -173,6 +173,7 @@
       for(var i in obj){
         //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
         obj[i].WON = false;
+        obj[i].PRICE = false;
       }
 
       //把物件寫入資料庫
@@ -250,7 +251,8 @@
       firebase.database().ref("users/"+index).set({
         "姓名": empName,
         "員工編號": empNO,
-        WON: false
+        WON: false,
+        PRICE: false
       },function(error){
         if(error){
           alert(empNO+"的資料寫入失敗!");
@@ -370,6 +372,10 @@
     }
 
 
+    function drawForWinner(){
+      alert("有反應~!");
+    }
+
     //繪製人員清單的table
     function drawNameTable(database){
 
@@ -385,20 +391,56 @@
 
           var parsedData =snap.val();
 
-          var nTable = document.getElementById("nameTable");
+          var nTable = document.getElementById("nameTable");  //人員清單
+          var wTable = document.getElementById("winnerTable");//中獎人清單
+
 
           //每次繪製前，先把Table的第一行以外的內容清空
           for(var i = 1; i < nTable.rows.length;){
               nTable.deleteRow(i);
           }
+          for(var i = 1; i < wTable.rows.length;){
+              wTable.deleteRow(i);
+          }
 
-          var tbody = document.createElement("tbody");
+          var tbody = document.createElement("tbody"); //人員清單用
+          var tbodyW = document.createElement("tbody");//中獎人清單用
 
           for(var i in parsedData){
             //console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
 
             //創建TR
-            var tr = document.createElement("tr");
+            var tr = document.createElement("tr"); //人員清單用
+
+            var winLabel = "";
+            //若抽中結果為true，就把字體、底色改變
+            if(parsedData[i].WON == true){
+              //====人員清單用=====================
+              tr.style.color = "red";
+              tr.style.backgroundColor = "yellow";
+              winLabel = "V";
+
+              //====中獎人清單用=======================
+              var trW = document.createElement("tr");
+              //第一個TD
+              var td1W = document.createElement("td");
+              var txt1W = document.createTextNode(parsedData[i]["員工編號"]);
+              td1W.appendChild(txt1W);
+              trW.appendChild(td1W);
+              //第二個TD
+              var td2W = document.createElement("td");
+              var txt2W = document.createTextNode(parsedData[i]["姓名"]);
+              td2W.appendChild(txt2W);
+              trW.appendChild(td2W);
+              //第三個TD
+              var td3W = document.createElement("td");
+              var txt3W = document.createTextNode(parsedData[i].PRICE);  //用winLabel來切換是否顯示打勾
+              td3W.appendChild(txt3W);
+              trW.appendChild(td3W);
+              //加進tbody跟table
+              tbodyW.appendChild(trW);
+              wTable.appendChild(tbodyW);
+            }
 
             //第一個TD
             var td1 = document.createElement("td");
@@ -412,7 +454,7 @@
             tr.appendChild(td2);
             //第三個TD
             var td3 = document.createElement("td");
-            var txt3 = document.createTextNode(parsedData[i].WON);
+            var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示打勾
             td3.appendChild(txt3);
             tr.appendChild(td3);
 
@@ -441,7 +483,6 @@
       else{
         alert("沒有連線到firebase...");
         document.getElementById("connection-status").innerHTML = "連線失敗";
-
       }
     }
 
@@ -481,8 +522,22 @@
           <h2 class="mdl-card__title-text">Firebase Email &amp; Password Authentication</h2>
         </div>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-          <p>Enter an email and password below and either sign in to an existing account or sign up</p>
+          <p>匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p>
 
+          <div id="resultArea" style="float: right">
+
+            <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="drawForWinner()">抽獎</button>
+            <br>
+
+            <h5>中獎清單</h5>
+            <table id="winnerTable">
+              <tr>
+                <th>工號:</th>
+                <th>姓名:</th>
+                <th>獎項:</th>
+              </tr>
+            </table>
+          </div>
 
           <input type="file" id="file">
           <button onclick="getExcelContent()">讀取檔案</button>
@@ -505,13 +560,32 @@
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
             資料庫連線狀態: <span id="connection-status">Unknown</span>
-            <pre><code>
+            <br>
+            <!-- <pre><code> -->
 
-              <table id="nameTable">
+              <table id="nameTable" style="display: inline">
                 <tr>
                   <th>工號:</th>
                   <th>姓名:</th>
                   <th>中獎:</th>
+                </tr>
+                <!-- <tr>
+                  <td>Jill</td>
+                  <td>Smith</td>
+                  <td>50</td>
+                </tr>
+                <tr>
+                  <td>Eve</td>
+                  <td>Jackson</td>
+                  <td>94</td>
+                </tr> -->
+              </table>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <table style="display: inline">
+                <tr>
+                  <th>序號:</th>
+                  <th>中獎:</th>
+                  <th>中獎人:</th>
                 </tr>
                 <tr>
                   <td>Jill</td>
@@ -525,8 +599,14 @@
                 </tr>
               </table>
 
-            </code></pre>
+            <!-- </code></pre> -->
           </div>
+
+
+
+
+
+
         </div>
       </div>
 
