@@ -192,7 +192,8 @@
         var obj = empList["獎項"];
         console.log(obj);
         for(var i in obj){
-          obj[i].WINNER = false;
+          obj[i].WINNERid = false;
+          //obj[i].WINNERname = false;
         }
 
         //把物件寫入資料庫
@@ -488,6 +489,66 @@
 
         });
 
+        //===撈取獎項DB的全部資料，並繪製於table中======================
+        var priceSheet = firebase.database().ref("priceList");
+
+        //取得table中的全部資料(寫法A)
+        query = priceSheet.orderByValue();
+        query.on('value', snap => {
+
+          var parsedData =snap.val();
+
+          var pTable = document.getElementById("priceTable");//獎項清單
+
+          //每次繪製前，先把Table的第一行以外的內容清空
+          for(var i = 1; i < pTable.rows.length;){
+              pTable.deleteRow(i);
+          }
+
+          var tbodyP = document.createElement("tbody");//中獎人清單用
+
+          for(var i in parsedData){
+
+            //創建TR
+            var tr = document.createElement("tr"); //人員清單用
+
+            var winLabel = "";
+            var winLabel2 = "";
+            //若獲獎者清單不為false，表示已經被抽中，就把字體、底色改變
+            if(parsedData[i].WINNERid != false){
+              tr.style.color = "red";
+              tr.style.backgroundColor = "yellow";
+              winLabel = parsedData[i].WINNERid;
+              //winLabel2 = parsedData[i].WINNERname;
+            }
+
+            //第一個TD
+            var td1 = document.createElement("td");
+            var txt1 = document.createTextNode(parsedData[i]["編號"]);
+            td1.appendChild(txt1);
+            tr.appendChild(td1);
+            //第二個TD
+            var td2 = document.createElement("td");
+            var txt2 = document.createTextNode(parsedData[i]["獎項"]);
+            td2.appendChild(txt2);
+            tr.appendChild(td2);
+            //第三個TD
+            var td3 = document.createElement("td");
+            var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示id
+            td3.appendChild(txt3);
+            tr.appendChild(td3);
+            //第四個TD
+            var td4 = document.createElement("td");
+            var txt4 = document.createTextNode("");  //用winLabel2來切換是否顯示name
+            td4.appendChild(txt4);
+            tr.appendChild(td4);
+
+            //加進tbody跟table
+            tbodyP.appendChild(tr);
+            pTable.appendChild(tbodyP);
+          }
+        });
+
       }
       catch(err) {
           alert("發生錯誤: "+err.message);
@@ -626,21 +687,12 @@
                 </tr> -->
               </table>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <table style="display: inline">
+              <table id="priceTable" style="display: inline">
                 <tr>
                   <th>序號:</th>
                   <th>中獎:</th>
+                  <th>中獎工號:</th>
                   <th>中獎人:</th>
-                </tr>
-                <tr>
-                  <td>Jill</td>
-                  <td>Smith</td>
-                  <td>50</td>
-                </tr>
-                <tr>
-                  <td>Eve</td>
-                  <td>Jackson</td>
-                  <td>94</td>
                 </tr>
               </table>
 
