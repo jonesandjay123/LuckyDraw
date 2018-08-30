@@ -436,9 +436,73 @@
       checkIDexits(type, empNO, empName, dataExits, index, executeAction);
     }
 
-
+    //抽獎動作
     function drawForWinner(){
-      alert("有反應~!");
+      autoSelectLastItem();
+      /*
+      //驗證還有沒有得抽
+      var cbCount = document.querySelectorAll('input[type="checkbox"]').length; //找出所有checkbox
+      var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
+      if(doneCount >= cbCount){
+        alert("所有獎項皆已抽完!");
+        return;
+      }
+
+      //驗證有沒有勾選抽獎項目
+      var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
+      var count = selectedCB.length //選中的checkbox數量
+
+      if(count == 0){
+        alert("未選取獎項! ");
+        return;
+      }
+
+      alert("選中的CB編號為: "+selectedCB[0].id);
+      */
+    }
+
+    //自動由下往上勾選獎品項目
+    function autoSelectLastItem(){
+      //驗證還有沒有得抽
+      var CBs = document.querySelectorAll('input[type="checkbox"]'); //所有的選項
+      var cbCount = CBs.length; //找出所有checkbox
+      var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
+      if(doneCount >= cbCount){
+        alert("所有獎項皆已抽完!");
+        return;
+      }
+
+      //驗證有沒有勾選抽獎項目
+      var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
+      var count = selectedCB.length //選中的checkbox數量
+
+      //如果已經有人為選擇了，就不自動幫忙選中最下面一筆
+      if(count > 0){return;}
+
+      for(i = 1; cbCount-i > -1;  i++){
+        console.log("cbCount-i: "+cbCount+" "+ i);
+        var trgID = CBs[cbCount-i].id;
+        console.log("trgID: "+trgID);
+      }
+
+
+      var trgID = CBs[cbCount-1].id;
+      //alert("清單中最後一個選項的CB編號為: "+trgID);
+
+      var trgCheckbox = document.getElementById(trgID);
+
+      if(document.getElementById(trgID).disabled){
+        console.log("disabled了!");
+      }
+      else{
+        console.log("還沒有disabled!");
+        trgCheckbox.checked = true;
+      }
+
+      //trgCheckbox.parentNode.parentNode.style.color = "red";
+      //trgCheckbox.parentNode.parentNode.style.backgroundColor = "yellow";
+
+
     }
 
     //繪製人員清單的table
@@ -584,6 +648,23 @@
             td4.appendChild(txt4);
             tr.appendChild(td4);
 
+            //第五個TD
+            var td5 = document.createElement("td");
+            var txt5 = document.createTextNode("測試");
+            var checkbox = document.createElement('input');
+            checkbox.type = "checkbox";
+            checkbox.name = "checkboxs";
+            checkbox.value = "value"+parsedData[i]["編號"];
+            checkbox.id = "cb"+parsedData[i]["編號"];
+            checkbox.onclick=selectOnlyThis.bind(null, checkbox);
+
+            if(parsedData[i].WINNERid != false){
+              checkbox.disabled= true;
+            }
+
+            td5.appendChild(checkbox);
+            tr.appendChild(td5);
+
             //加進tbody跟table
             tbodyP.appendChild(tr);
             pTable.appendChild(tbodyP);
@@ -619,6 +700,20 @@
         }
         return size;
     };
+
+    //讓選項一次只能選中一個!
+    function selectOnlyThis(checkbox){
+      var cbs = document.getElementsByName("checkboxs"); //找出全部的checkbox，進而算出有幾個。
+
+      for (var i = 1;i <= cbs.length; i++)
+      {
+          document.getElementById("cb" + i).checked = false;
+      }
+      document.getElementById(checkbox.id).checked = true;
+
+      //alert(checkbox.id);
+      console.log("選中的項目ID為: "+checkbox.id);
+    }
 
     //驗證現在選取的是哪個
     function checkfileType(){
