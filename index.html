@@ -193,7 +193,7 @@
         console.log(obj);
         for(var i in obj){
           obj[i].WINNERid = false;
-          //obj[i].WINNERname = false;
+          obj[i].WINNERname = false;
         }
 
         //把物件寫入資料庫
@@ -266,42 +266,64 @@
     function addEmpData(empNO, empName, index){
       //console.log("走新增: empNO: "+empNO + "   empName: "+empName );
 
-      //撈取user底下的最下面一筆資料
-      firebase.database().ref("users").orderByValue().limitToLast(1).on("value", function(snapshot) {
-        snapshot.forEach(function(data) { index = data.key   });
-      });
-      index++; //index值++就是下一筆資料的位置
+      var DBtype = null;
+      if(checkfileType()=="empListRadio"){
+        DBtype = "users";
+        var inputObj = {
+          "姓名": empName,
+          "員工編號": empNO,
+          WON: false,
+          PRICE: false
+        };
 
-      firebase.database().ref("users/"+index).set({
-        "姓名": empName,
-        "員工編號": empNO,
-        WON: false,
-        PRICE: false
-      },function(error){
-        if(error){
-          alert(empNO+"的資料寫入失敗!");
-          console.log(empNO+"的資料寫入失敗! error: " + error);
-        }
-        else{
-          alert("工號:"+empNO+" 姓名:"+empName+" 資料寫入成功!");
-        }
-      });
+      }
+      else{
+        DBtype = "priceList";
+        var inputObj = {
+          "獎項": empName,
+          "編號": empNO,
+          WINNERid: false,
+          WINNERname: false
+        };
+
+      }
+        //撈取user底下的最下面一筆資料
+        firebase.database().ref(DBtype).orderByValue().limitToLast(1).on("value", function(snapshot) {
+          snapshot.forEach(function(data) { index = data.key   });
+        });
+        index++; //index值++就是下一筆資料的位置
+
+        firebase.database().ref(DBtype+"/"+index).set(inputObj,function(error){
+          if(error){
+            alert(empNO+"的資料寫入失敗!");
+            console.log(empNO+"的資料寫入失敗! error: " + error);
+          }
+          else{
+            alert(empName+" 資料寫入成功!");
+          }
+        });
+
 
     }
 
     //修改員工資料
     function editEmpData(empNO, empName, index){
-      console.log("走編輯: empNO: "+empNO + "   empName: "+empName + " index: "+index );
+      //console.log("走編輯: empNO: "+empNO + "   empName: "+empName + " index: "+index );
 
-      firebase.database().ref("users/"+index).update({
-        "姓名": empName
-      },function(error){
+      var DBtype = "users";
+      var updateParam = updateParam ={"姓名": empName};
+      if(checkfileType()!="empListRadio"){
+        DBtype = "priceList";
+        updateParam ={"獎項": empName};
+      }
+
+      firebase.database().ref(DBtype+"/"+index).update(updateParam,function(error){
         if(error){
           alert(empNO+"的資料更新失敗!");
           console.log(empNO+"的資料更新失敗! error: " + error);
         }
         else{
-          alert("工號:"+empNO+" 姓名更改為:"+empName+" 更新成功!");
+          alert("邊號:"+empNO+" 已成功更改為:"+empName+"!");
         }
       });
 
@@ -309,16 +331,21 @@
 
     //刪除員工資料
     function deleteEmpData(empNO, empName, index){
-      console.log("走刪除: empNO: "+empNO + "   empName: "+empName + " index: "+index);
+      //console.log("走刪除: empNO: "+empNO + "   empName: "+empName + " index: "+index);
 
-      firebase.database().ref("users/"+index).remove(
+      var DBtype = "users";
+      if(checkfileType()!="empListRadio"){
+        DBtype = "priceList";
+      }
+
+      firebase.database().ref(DBtype+"/"+index).remove(
         function(error){
         if(error){
           alert(empNO+"的資料移除失敗!");
           console.log(empNO+"的資料移除失敗! error: " + error);
         }
         else{
-          alert("工號:"+empNO+" 移除成功!");
+          alert("編號:"+empNO+"的資料，移除成功!");
           //清空輸入欄位
           document.getElementById("empNO").value = "";
           document.getElementById("empName").value = "";
@@ -333,17 +360,17 @@
 
       switch (type) {
         case "add":
-          if(dataExits){ alert("員工已存在，不可在新增!"); return; }
+          if(dataExits){ alert("編號已存在，不可在新增!"); return; }
           addEmpData(empNO, empName, index);
           break;
 
         case "edit":
-          if(!dataExits){alert("員工不存在，無法做修改!"); return; }
+          if(!dataExits){alert("編號不存在，無法做修改!"); return; }
           editEmpData(empNO, empName, index);
           break;
 
         default:
-          if(!dataExits){alert("員工不存在，無法做刪除!"); return; }
+          if(!dataExits){alert("編號不存在，無法做刪除!"); return; }
           deleteEmpData(empNO, empName, index);
       }
     }
@@ -351,19 +378,27 @@
     //進資料庫驗證工號是否存在
     function checkIDexits(type, empNO, empName, dataExits, index, callback){
 
-      //去資料庫中比對要輸入的名子是否已存在
-      firebase.database().ref("users").on('value', snap => {
+      var DBtype = "users";
+      var parameter = "員工編號";
 
-       snap.forEach(function(data) {
-             //console.log("標題: " + data.key + "     內容:"+data.val()["員工編號"]);
-             if(data.val()["員工編號"] == empNO){
-               dataExits = true;
-               index = data.key; //位置記錄進去index
-             }
-       });
+      if(checkfileType()!="empListRadio"){
+        DBtype = "priceList";
+        parameter = "編號";
+      }
+
+        //去資料庫中比對要輸入的名子是否已存在
+        firebase.database().ref(DBtype).on('value', snap => {
+
+         snap.forEach(function(data) {
+               //console.log("標題: " + data.key + "     內容:"+data.val()["員工編號"]);
+               if(data.val()[parameter] == empNO){
+                 dataExits = true;
+                 index = data.key; //位置記錄進去index
+               }
+         });
 
      });
-     //console.log("在callback方法checkIDexits裡面的驗證結果，工號:"+empNO+" 是否已存在:"+dataExits);
+     //console.log("在callback方法checkIDexits裡面的驗證結果，"+empNO+" 是否已存在:"+dataExits);
      callback(type, empNO, empName, dataExits, index); //判斷完後，將判斷完的結果callback接續執行...
 
     }
@@ -371,18 +406,24 @@
     //三個按鈕共用的參數驗證區塊
     function sendInput(type){
 
+      var text1 = "員工編號", text2 = "員工姓名";
+      if(checkfileType()!="empListRadio"){
+        text1 = "編號", text2 = "獎項名稱";
+      }
+
+
       var empNO = document.getElementById("empNO").value.trim();
       var empName = document.getElementById("empName").value.trim();
 
-      if(empNO == null || empNO == ""){ alert("未填寫員工編號~"); return; }
+      if(empNO == null || empNO == ""){ alert("未填寫"+text1+"~"); return; }
 
       switch (type) {
         case "add":
-          if(empName == null || empName == ""){ alert("未填寫要新增的員工姓名~"); return; }
+          if(empName == null || empName == ""){ alert("未填寫要新增的"+text2+"~"); return; }
           break;
 
         case "edit":
-          if(empName == null || empName == ""){ alert("未填寫要修改的員工姓名~"); return; }
+          if(empName == null || empName == ""){ alert("未填寫要修改的"+text2+"~"); return; }
           break;
 
         default:
@@ -519,7 +560,7 @@
               tr.style.color = "red";
               tr.style.backgroundColor = "yellow";
               winLabel = parsedData[i].WINNERid;
-              //winLabel2 = parsedData[i].WINNERname;
+              winLabel2 = parsedData[i].WINNERname;
             }
 
             //第一個TD
@@ -539,7 +580,7 @@
             tr.appendChild(td3);
             //第四個TD
             var td4 = document.createElement("td");
-            var txt4 = document.createTextNode("");  //用winLabel2來切換是否顯示name
+            var txt4 = document.createTextNode(winLabel2);  //用winLabel2來切換是否顯示name
             td4.appendChild(txt4);
             tr.appendChild(td4);
 
