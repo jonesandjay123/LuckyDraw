@@ -177,6 +177,7 @@
           //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
           obj[i].WON = false;
           obj[i].PRICE = false;
+          obj[i].SHOWUP = true;
         }
 
         //把物件寫入資料庫
@@ -227,9 +228,9 @@
         output = JSON.stringify(to_json(wb), 2, 2);
 
         mapToDB(to_json(wb));  //從中將map資料拿去寫入firebaseDB
-        //console.log(output);
-        if(out.innerText === undefined) out.textContent = output;
-        else out.innerText = output;
+        console.log(output);
+        //if(out.innerText === undefined) out.textContent = output;
+        //else out.innerText = output;
     }
 
 
@@ -438,13 +439,43 @@
 
     //抽獎動作
     function drawForWinner(){
-      autoSelectLastItem();
-      /*
+
       //驗證還有沒有得抽
       var cbCount = document.querySelectorAll('input[type="checkbox"]').length; //找出所有checkbox
       var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
       if(doneCount >= cbCount){
         alert("所有獎項皆已抽完!");
+        return;
+      }
+
+      var attendenceCount = 0, winnerCount = 0; //計算出席資訊
+      var indexList = []; //抽籤用的array
+
+      //所有showup為true的人員清單
+      var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
+      query.on('value', snap => {
+
+        attendenceCount = Object.size(snap.val()); //query結果的總數
+        snap.forEach(function(data) {
+              indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
+
+              if(data.val()["WON"] == true){
+                winnerCount++;
+              }
+        });
+
+      });
+      console.log("出席者的人數為: "+attendenceCount);
+      console.log("當中已中獎人數為: "+winnerCount);
+
+      shuffleArray(indexList); //把array洗亂
+      for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
+
+      var drawnIndex = indexList[0]; //把洗亂後結果的第一筆，當作抽中的位置。
+      console.log("抽中的人員順序位置為: "+drawnIndex);
+
+      if(winnerCount == attendenceCount){
+        alert("所有出席者皆已有獎!! ");
         return;
       }
 
@@ -458,7 +489,17 @@
       }
 
       alert("選中的CB編號為: "+selectedCB[0].id);
-      */
+
+    }
+
+    //將array洗亂的function
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
     }
 
     //自動由下往上勾選獎品項目
@@ -472,36 +513,23 @@
         return;
       }
 
-      //驗證有沒有勾選抽獎項目
-      var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
-      var count = selectedCB.length //選中的checkbox數量
+      //由下往上逐一掃瞄
+      for(i = 1; cbCount-i >= 0;  i++){
+        //驗證有沒有勾選抽獎項目
+        var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
+        var count = selectedCB.length //選中的checkbox數量
 
-      //如果已經有人為選擇了，就不自動幫忙選中最下面一筆
-      if(count > 0){return;}
+        //如果已經有人為選擇了，就不自動幫忙選中最下面一筆
+        if(count > 0){return;}
 
-      for(i = 1; cbCount-i > -1;  i++){
-        console.log("cbCount-i: "+cbCount+" "+ i);
         var trgID = CBs[cbCount-i].id;
-        console.log("trgID: "+trgID);
+        var trgCheckbox = document.getElementById(trgID);
+
+        //如果還沒有disabled!
+        if(!document.getElementById(trgID).disabled){
+          trgCheckbox.checked = true; //就自動打勾
+        }
       }
-
-
-      var trgID = CBs[cbCount-1].id;
-      //alert("清單中最後一個選項的CB編號為: "+trgID);
-
-      var trgCheckbox = document.getElementById(trgID);
-
-      if(document.getElementById(trgID).disabled){
-        console.log("disabled了!");
-      }
-      else{
-        console.log("還沒有disabled!");
-        trgCheckbox.checked = true;
-      }
-
-      //trgCheckbox.parentNode.parentNode.style.color = "red";
-      //trgCheckbox.parentNode.parentNode.style.backgroundColor = "yellow";
-
 
     }
 
@@ -513,7 +541,8 @@
         var workSheet = firebase.database().ref("users");
 
         //取得table中的全部資料(寫法A)
-        var query = workSheet.orderByValue();
+        //var query = workSheet.orderByValue(); //全部query的寫法
+        var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
         query.on('value', snap => {
           //console.log("users的長度為: "+Object.size(snap.val()));
           //console.log(snap.val());
@@ -669,6 +698,7 @@
             tbodyP.appendChild(tr);
             pTable.appendChild(tbodyP);
           }
+          autoSelectLastItem(); //自動勾選最下方的可選獎項
         });
 
       }
