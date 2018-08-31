@@ -163,7 +163,51 @@
     }
 
     function exportResult(){
-      alert("匯出excel的功能仍在開發中");
+      //alert("匯出excel的功能仍在開發中");
+
+      //所有showup為true的人員清單
+      var query = firebase.database().ref("users").orderByChild("WON").equalTo(true);
+      query.on('value', snap => {
+
+        snap.forEach(function(data) {
+
+              console.log(data.val()["員工編號"]);
+              console.log(data.val()["姓名"]);
+              console.log(data.val()["PRICE"]);
+              /*
+              if(data.val()["WON"] == true){
+                winnerCount++;
+              }
+              //還沒中過獎的人加入清單
+              else{
+                indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
+              }
+              */
+        });
+
+      });
+
+
+      var data = [
+          {"name":"John", "city": "Seattle"},
+          {"name":"Mike", "city": "Los Angeles"},
+          {"name":"Zach", "city": "New York"}
+      ];
+      /*
+      // a this line is only needed if you are not adding a script tag reference
+      if(typeof XLSX == 'undefined') XLSX = require('xlsx');
+
+      // a make the worksheet
+      var ws = XLSX.utils.json_to_sheet(data);
+
+      // add to workbook
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "People");
+
+      // agenerate an XLSX file
+      XLSX.writeFile(wb, "sheetjs.xlsx");
+      */
+      console.log("匯出成功~"+data);
     }
 
     //把攔截出來的Map物件寫入firebaseDB
@@ -493,7 +537,7 @@
       }
 
       shuffleArray(indexList); //把array洗亂
-      for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
+      //for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
 
       var drawnIndex = indexList[0]; //把洗亂後結果的第一筆，當作抽中的位置。
       console.log("抽中的人員順序位置為: "+drawnIndex);
@@ -506,8 +550,6 @@
       winnderInfo.on('value', snap => {
         winnerID = snap.val()["員工編號"];
         winnerName = snap.val()["姓名"];
-        console.log("中獎人資訊: "+winnerID);
-        console.log("中獎人資訊: "+winnerName);
       });
 
 
@@ -522,8 +564,6 @@
       priceInfo.on('value', snap => {
         priceID = snap.val()["編號"];
         priceName = snap.val()["獎項"];
-        console.log("獎項資訊: "+priceID);
-        console.log("獎項資訊: "+priceName);
       });
 
 
