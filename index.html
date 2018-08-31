@@ -162,6 +162,9 @@
       }
     }
 
+    function exportResult(){
+      alert("匯出excel的功能仍在開發中");
+    }
 
     //把攔截出來的Map物件寫入firebaseDB
     function mapToDB(empList){
@@ -177,6 +180,7 @@
           //console.log(obj[i]["員工編號"] + " " +obj[i]["姓名"]);
           obj[i].WON = false;
           obj[i].PRICE = false;
+          obj[i].PID = false;
           obj[i].SHOWUP = true;
         }
 
@@ -274,7 +278,9 @@
           "姓名": empName,
           "員工編號": empNO,
           WON: false,
-          PRICE: false
+          PRICE: false,
+          PID: false,
+          SHOWUP: false
         };
 
       }
@@ -448,6 +454,15 @@
         return;
       }
 
+      var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
+      var count = selectedCB.length //選中的checkbox數量
+
+      //驗證有沒有勾選抽獎項目
+      if(count == 0){
+        alert("未選取獎項! ");
+        return;
+      }
+
       var attendenceCount = 0, winnerCount = 0; //計算出席資訊
       var indexList = []; //抽籤用的array
 
@@ -457,10 +472,13 @@
 
         attendenceCount = Object.size(snap.val()); //query結果的總數
         snap.forEach(function(data) {
-              indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
 
               if(data.val()["WON"] == true){
                 winnerCount++;
+              }
+              //還沒中過獎的人加入清單
+              else{
+                indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
               }
         });
 
@@ -468,27 +486,72 @@
       console.log("出席者的人數為: "+attendenceCount);
       console.log("當中已中獎人數為: "+winnerCount);
 
+      //如果不用再抽了，就停在這。
+      if(winnerCount == attendenceCount){
+        alert("所有出席者皆已有獎!! ");
+        return;
+      }
+
       shuffleArray(indexList); //把array洗亂
       for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
 
       var drawnIndex = indexList[0]; //把洗亂後結果的第一筆，當作抽中的位置。
       console.log("抽中的人員順序位置為: "+drawnIndex);
 
-      if(winnerCount == attendenceCount){
-        alert("所有出席者皆已有獎!! ");
-        return;
-      }
+      //透過drawnIndex找出對應的使用者資訊
+      var winnderInfo = firebase.database().ref("users/"+drawnIndex).orderByValue();
+      var winnerID = null;
+      var winnerName = null;
 
-      //驗證有沒有勾選抽獎項目
-      var selectedCB = document.querySelectorAll('input[type="checkbox"]:checked'); //找出所有，被選中的checkbox
-      var count = selectedCB.length //選中的checkbox數量
+      winnderInfo.on('value', snap => {
+        winnerID = snap.val()["員工編號"];
+        winnerName = snap.val()["姓名"];
+        console.log("中獎人資訊: "+winnerID);
+        console.log("中獎人資訊: "+winnerName);
+      });
 
-      if(count == 0){
-        alert("未選取獎項! ");
-        return;
-      }
 
-      alert("選中的CB編號為: "+selectedCB[0].id);
+      var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
+      drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
+
+      //透過drawnItemIndex找出對應的獎項資訊
+      var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
+      var priceID = null;
+      var priceName = null;
+
+      priceInfo.on('value', snap => {
+        priceID = snap.val()["編號"];
+        priceName = snap.val()["獎項"];
+        console.log("獎項資訊: "+priceID);
+        console.log("獎項資訊: "+priceName);
+      });
+
+
+      firebase.database().ref("users/"+drawnIndex).update(
+        updateParam ={
+          "WON": true,
+          "PID": priceID,
+          "PRICE": priceName,
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
+
+      firebase.database().ref("priceList/"+drawnItemIndex).update(
+        updateParam ={
+          "WINNERid": winnerID,
+          "WINNERname": winnerName
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
+
+
+      alert("恭喜: "+winnerName+ " 抽中: "+priceName);
 
     }
 
@@ -811,7 +874,7 @@
           <button onclick="getExcelContent()">讀取檔案</button>
           <output id="out"></output>
           <br/><br/>
-          <button onclick="getListFromDB()">讀取資料庫清單</button>
+          <button onclick="exportResult()">匯出中獎名單</button>
           <br/><br/>
           <form>
             <input type="radio" name="fileType" onclick="checkfileType()" value="empListRadio">員工清單<br>
