@@ -163,37 +163,33 @@
     }
 
     function exportResult(){
-      //alert("匯出excel的功能仍在開發中");
 
       //所有showup為true的人員清單
       var query = firebase.database().ref("users").orderByChild("WON").equalTo(true);
+
+      var keepdoing = true;
+      var data = []; //陣列物件
+
       query.on('value', snap => {
 
-        snap.forEach(function(data) {
+        if(Object.size(snap.val()) <= 0){
+          alert("沒有人中獎!");
+          keepdoing = false;
+          return;
+        }
 
-              console.log(data.val()["員工編號"]);
-              console.log(data.val()["姓名"]);
-              console.log(data.val()["PRICE"]);
-              /*
-              if(data.val()["WON"] == true){
-                winnerCount++;
-              }
-              //還沒中過獎的人加入清單
-              else{
-                indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
-              }
-              */
+        snap.forEach(function(result) {
+            var obj = {
+              "獎項": result.val()["PRICE"],
+              "工號": result.val()["員工編號"],
+              "姓名": result.val()["姓名"]
+            };
+            data.push(obj);  //把obj塞入陣列
         });
-
       });
 
+      if(!keepdoing){ return;}
 
-      var data = [
-          {"name":"John", "city": "Seattle"},
-          {"name":"Mike", "city": "Los Angeles"},
-          {"name":"Zach", "city": "New York"}
-      ];
-      /*
       // a this line is only needed if you are not adding a script tag reference
       if(typeof XLSX == 'undefined') XLSX = require('xlsx');
 
@@ -205,9 +201,11 @@
       XLSX.utils.book_append_sheet(wb, ws, "People");
 
       // agenerate an XLSX file
-      XLSX.writeFile(wb, "sheetjs.xlsx");
-      */
+      XLSX.writeFile(wb, "中獎名單.xlsx");
+
       console.log("匯出成功~"+data);
+
+
     }
 
     //把攔截出來的Map物件寫入firebaseDB
