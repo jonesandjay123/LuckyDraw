@@ -487,6 +487,57 @@
       checkIDexits(type, empNO, empName, dataExits, index, executeAction);
     }
 
+
+    //讓出-讓抽中的結果回復!
+    function rollbackResult(btn){
+
+      var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
+      var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;
+
+      if (!confirm("是否確定要讓出 "+winnerName+" 所獲得的 "+winnerPrice+"? ")){return;}
+
+      //先抓到中獎人工號
+      var userID = btn.id.substring(4); //把id中前4個win_的字元移除
+
+      //透過中獎人工號找到它們在資料庫中的位置
+      var indexInUser = null, indexInPriceList = null;
+
+      //找到users位置，並更新資料
+      firebase.database().ref("users").orderByChild("員工編號").equalTo(userID).on("value", function(snapshot) {
+        snapshot.forEach(function(data) {
+              indexInUser = data.key;
+        });
+      });
+      firebase.database().ref("users/"+indexInUser).update(
+        updateParam ={
+          "PID": false,
+          "PRICE": false,
+          "WON": false
+        },function(error){
+        if(error){
+          alert("員工資料更新失敗!");
+          console.log("員工資料更新失敗!" + error);
+        }
+      });
+
+      //找到priceList位置，並更新資料
+      firebase.database().ref("priceList").orderByChild("WINNERid").equalTo(userID).on("value", function(snapshot) {
+        snapshot.forEach(function(data) {
+              indexInPriceList = data.key;
+        });
+      });
+      firebase.database().ref("priceList/"+indexInPriceList).update(
+        updateParam ={
+          "WINNERid": false,
+          "WINNERname": false
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
+    }
+
     //抽獎動作
     function drawForWinner(){
 
@@ -511,7 +562,10 @@
       var indexList = []; //抽籤用的array
 
       //所有showup為true的人員清單
-      var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
+      //var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
+
+      //所有人員清單
+      var query = firebase.database().ref("users");
       query.on('value', snap => {
 
         attendenceCount = Object.size(snap.val()); //query結果的總數
@@ -527,8 +581,8 @@
         });
 
       });
-      console.log("出席者的人數為: "+attendenceCount);
-      console.log("當中已中獎人數為: "+winnerCount);
+      //console.log("出席者的人數為: "+attendenceCount);
+      //console.log("當中已中獎人數為: "+winnerCount);
 
       //如果不用再抽了，就停在這。
       if(winnerCount == attendenceCount){
@@ -552,7 +606,6 @@
         winnerName = snap.val()["姓名"];
       });
 
-
       var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
       drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
 
@@ -566,12 +619,11 @@
         priceName = snap.val()["獎項"];
       });
 
-
       firebase.database().ref("users/"+drawnIndex).update(
         updateParam ={
           "WON": true,
           "PID": priceID,
-          "PRICE": priceName,
+          "PRICE": priceName
         },function(error){
         if(error){
           alert("中獎資料更新失敗!");
@@ -644,8 +696,8 @@
         var workSheet = firebase.database().ref("users");
 
         //取得table中的全部資料(寫法A)
-        //var query = workSheet.orderByValue(); //全部query的寫法
-        var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
+        //var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
+        var query = workSheet.orderByValue(); //全部query的寫法
         query.on('value', snap => {
           //console.log("users的長度為: "+Object.size(snap.val()));
           //console.log(snap.val());
@@ -653,19 +705,13 @@
           var parsedData =snap.val();
 
           var nTable = document.getElementById("nameTable");  //人員清單
-          var wTable = document.getElementById("winnerTable");//中獎人清單
-
 
           //每次繪製前，先把Table的第一行以外的內容清空
           for(var i = 1; i < nTable.rows.length;){
               nTable.deleteRow(i);
           }
-          for(var i = 1; i < wTable.rows.length;){
-              wTable.deleteRow(i);
-          }
 
           var tbody = document.createElement("tbody"); //人員清單用
-          var tbodyW = document.createElement("tbody");//中獎人清單用
 
           for(var i in parsedData){
             //console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
@@ -680,27 +726,6 @@
               tr.style.color = "red";
               tr.style.backgroundColor = "yellow";
               winLabel = "V";
-
-              //====中獎人清單用=======================
-              var trW = document.createElement("tr");
-              //第一個TD
-              var td1W = document.createElement("td");
-              var txt1W = document.createTextNode(parsedData[i]["員工編號"]);
-              td1W.appendChild(txt1W);
-              trW.appendChild(td1W);
-              //第二個TD
-              var td2W = document.createElement("td");
-              var txt2W = document.createTextNode(parsedData[i]["姓名"]);
-              td2W.appendChild(txt2W);
-              trW.appendChild(td2W);
-              //第三個TD
-              var td3W = document.createElement("td");
-              var txt3W = document.createTextNode(parsedData[i].PRICE);  //用winLabel來切換是否顯示打勾
-              td3W.appendChild(txt3W);
-              trW.appendChild(td3W);
-              //加進tbody跟table
-              tbodyW.appendChild(trW);
-              wTable.appendChild(tbodyW);
             }
 
             //第一個TD
@@ -736,10 +761,15 @@
           var parsedData =snap.val();
 
           var pTable = document.getElementById("priceTable");//獎項清單
+          var wTable = document.getElementById("winnerTable");//中獎人清單
+          var tbodyW = document.createElement("tbody");//中獎人清單用
 
           //每次繪製前，先把Table的第一行以外的內容清空
           for(var i = 1; i < pTable.rows.length;){
               pTable.deleteRow(i);
+          }
+          for(var i = 1; i < wTable.rows.length;){
+              wTable.deleteRow(i);
           }
 
           var tbodyP = document.createElement("tbody");//中獎人清單用
@@ -757,6 +787,41 @@
               tr.style.backgroundColor = "yellow";
               winLabel = parsedData[i].WINNERid;
               winLabel2 = parsedData[i].WINNERname;
+
+              //====中獎人清單用=======================
+              var trW = document.createElement("tr");
+              //第一個TD
+              var td1W = document.createElement("td");
+              var txt1W = document.createTextNode(parsedData[i]["獎項"]);
+              td1W.appendChild(txt1W);
+              trW.appendChild(td1W);
+              //第二個TD
+              var td2W = document.createElement("td");
+              var txt2W = document.createTextNode(parsedData[i].WINNERid);
+              td2W.appendChild(txt2W);
+              trW.appendChild(td2W);
+              //第三個TD
+              var td3W = document.createElement("td");
+              var txt3W = document.createTextNode(parsedData[i].WINNERname);  //用winLabel來切換是否顯示打勾
+              td3W.appendChild(txt3W);
+              trW.appendChild(td3W);
+
+              //第四個TD
+              var td4W = document.createElement("td");
+              var btn = document.createElement('BUTTON');
+              var t = document.createTextNode("讓出");
+              btn.appendChild(t);
+              btn.type = "btn";
+              btn.name = "btns";
+              btn.id = "win_"+parsedData[i].WINNERid;
+              btn.onclick=rollbackResult.bind(null, btn);
+
+              td4W.appendChild(btn);
+              trW.appendChild(td4W);
+
+              //加進tbody跟table
+              tbodyW.appendChild(trW);
+              wTable.appendChild(tbodyW);
             }
 
             //第一個TD
@@ -782,7 +847,6 @@
 
             //第五個TD
             var td5 = document.createElement("td");
-            var txt5 = document.createTextNode("測試");
             var checkbox = document.createElement('input');
             checkbox.type = "checkbox";
             checkbox.name = "checkboxs";
@@ -903,9 +967,10 @@
             <h5>中獎清單</h5>
             <table id="winnerTable">
               <tr>
+                <th>獎項:</th>
                 <th>工號:</th>
                 <th>姓名:</th>
-                <th>獎項:</th>
+                <th>-</th>
               </tr>
             </table>
           </div>
