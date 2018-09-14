@@ -460,7 +460,7 @@
 
       var path = window.location.pathname;
       var page = path.split("/").pop();
-      console.log( page );
+      //console.log( page );
 
       //如果是FortuneSlot.html(開獎頁面)，才要走進doAnimation。
       if(page == "FortuneSlot.html"){
