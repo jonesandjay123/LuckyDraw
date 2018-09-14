@@ -410,6 +410,7 @@
 
       var attendenceCount = 0, winnerCount = 0; //計算出席資訊
       var indexList = []; //抽籤用的array
+      var possibleWinnerIDList = []; //可能中獎的工號清單(doAnimation需要用到)
 
       //所有showup為true的人員清單
       //var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
@@ -427,6 +428,7 @@
               //還沒中過獎的人加入清單
               else{
                 indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
+                possibleWinnerIDList.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
               }
         });
 
@@ -455,6 +457,20 @@
         winnerID = snap.val()["員工編號"];
         winnerName = snap.val()["姓名"];
       });
+
+      var path = window.location.pathname;
+      var page = path.split("/").pop();
+      console.log( page );
+
+      //如果是FortuneSlot.html(開獎頁面)，才要走進doAnimation。
+      if(page == "FortuneSlot.html"){
+        //輪盤動畫要用到的3行。
+        var textobj = [];
+        textobj.push(winnerID); //必須要要傳一個陣列進去。
+        doAnimation(textobj, possibleWinnerIDList);
+      }
+
+
 
       var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
       drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
@@ -494,7 +510,6 @@
 
 
       alert("恭喜: "+winnerName+ " 抽中: "+priceName);
-
     }
 
     //將array洗亂的function
@@ -779,7 +794,7 @@
     }
 
 
-	
+
 /*
   //取得table中的全部資料(寫法B)
   userList.orderByValue().on("value", function(snap){
@@ -840,4 +855,97 @@
 
   //在這裡撈取工作表的清單...
  */
-	
+
+
+ //繪製角子老虎機動畫效果的方法
+ function doAnimation(text, chars){
+
+    //console.log(text);
+    //console.log(chars);
+
+    //text = '021573';  // The message displayed
+    //chars = '0123456789';  // All possible Charactrers
+    scale = 50;  // Font size and overall scale
+    breaks = 0.001;  // Speed loss per frame
+    endSpeed = 0.005;  // Speed at which the letter stops
+    firstLetter = 240;  // Number of frames untill the first letter stopps (60 frames per second)
+    delay = 200;  // Number of frames between letters stopping
+
+    canvas = document.querySelector('canvas');
+    ctx = canvas.getContext('2d');
+
+    //text = text.split('');
+    //chars = chars.split('');
+    charMap = [];
+    offset = [];
+    offsetV = [];
+
+    //text = ["Jones"];
+    //chars = ["Jones","Alex","Justin","Sherry","Scott"];
+
+    for(var i=0;i<chars.length;i++){
+      charMap[chars[i]] = i;
+    }
+
+    for(var i=0;i<text.length;i++){
+      var f = firstLetter+delay*i;
+      offsetV[i] = endSpeed+breaks*f;
+      offset[i] = -(1+f)*(breaks*f+2*endSpeed)/2;
+    }
+
+    (onresize = function(){
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    })();
+
+    var innerLoopDone = false;
+    requestAnimationFrame(loop = function(){
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#488';
+      ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+      for(var i=0;i<text.length;i++){
+        ctx.fillStyle = '#ccc';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.setTransform(1,0,0,1,Math.floor((canvas.width-scale*(text.length-1))/2),Math.floor(canvas.height/2));
+        var o = offset[i];
+        while(o<0)o++;
+        o %= 1;
+        var h = Math.ceil(canvas.height/2/scale)
+        for(var j=-h;j<h;j++){
+          var c = charMap[text[i]]+j-Math.floor(offset[i]);
+          while(c<0)c+=chars.length;
+          c %= chars.length;
+          var s = 1-Math.abs(j+o)/(canvas.height/2/scale+1)
+          ctx.globalAlpha = s
+          ctx.font = scale*s + 'px Helvetica'
+          ctx.fillText(chars[c],scale*i,(j+o)*scale);
+        }
+        offset[i] += offsetV[i];
+        offsetV[i] -= breaks;
+        if(offsetV[i]<endSpeed){
+          offset[i] = 0;
+          offsetV[i] = 0;
+
+          //滾動完畢的標記點
+          if(!innerLoopDone){
+            console.log("~~~~執行完doAnimation");
+            innerLoopDone = true;
+            innerLoopDoneRun();
+          }
+        }
+      }
+
+      requestAnimationFrame(loop);
+    });
+
+    function innerLoopDoneRun(){
+      console.log("~~~~執行完doAnimation!!!!!!!!");
+    }
+
+
+
+
+ }
