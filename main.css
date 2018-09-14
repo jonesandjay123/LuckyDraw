@@ -55,8 +55,8 @@ code {
 }
 h3 {
   background: url('CymmetrikLogo.png') no-repeat;
-  background-size: 40px;
-  padding-left: 50px;
+  background-size: 120px;
+  padding-left: 140px;
   color: white;
 }
 #verification-code-form {
