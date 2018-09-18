@@ -458,20 +458,6 @@
         winnerName = snap.val()["姓名"];
       });
 
-      var path = window.location.pathname;
-      var page = path.split("/").pop();
-      //console.log( page );
-
-      //如果是FortuneSlot.html(開獎頁面)，才要走進doAnimation。
-      if(page == "FortuneSlot.html"){
-        //輪盤動畫要用到的3行。
-        var textobj = [];
-        textobj.push(winnerID); //必須要要傳一個陣列進去。
-        doAnimation(textobj, possibleWinnerIDList);
-      }
-
-
-
       var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
       drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
 
@@ -485,31 +471,48 @@
         priceName = snap.val()["獎項"];
       });
 
-      firebase.database().ref("users/"+drawnIndex).update(
-        updateParam ={
-          "WON": true,
-          "PID": priceID,
-          "PRICE": priceName
-        },function(error){
-        if(error){
-          alert("中獎資料更新失敗!");
-          console.log("中獎資料更新失敗!" + error);
-        }
-      });
+      var path = window.location.pathname;
+      var page = path.split("/").pop();
+      //console.log( page );
 
-      firebase.database().ref("priceList/"+drawnItemIndex).update(
-        updateParam ={
-          "WINNERid": winnerID,
-          "WINNERname": winnerName
-        },function(error){
-        if(error){
-          alert("中獎資料更新失敗!");
-          console.log("中獎資料更新失敗!" + error);
-        }
-      });
+      //如果是FortuneSlot.html(開獎頁面)，才要走進doAnimation。
+      if(page == "FortuneSlot.html"){
+        //輪盤動畫要用到的3行。
+        var textobj = [];
+        textobj.push(winnerID); //必須要要傳一個陣列進去。
+        //為了讓firebase update的動作接在動畫之後，只好把要更新的參數，全部放進動畫裡面，等值動畫結束後在裡面進行update...
+        doAnimation(textobj, possibleWinnerIDList, drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
+      }
+      //若不是FortuneSlot.html的畫面的話，則抽獎完的update動作將是及時的。
+      else{
+
+        firebase.database().ref("users/"+drawnIndex).update(
+          updateParam ={
+            "WON": true,
+            "PID": priceID,
+            "PRICE": priceName
+          },function(error){
+          if(error){
+            alert("中獎資料更新失敗!");
+            console.log("中獎資料更新失敗!" + error);
+          }
+        });
+
+        firebase.database().ref("priceList/"+drawnItemIndex).update(
+          updateParam ={
+            "WINNERid": winnerID,
+            "WINNERname": winnerName
+          },function(error){
+          if(error){
+            alert("中獎資料更新失敗!");
+            console.log("中獎資料更新失敗!" + error);
+          }
+        });
+
+        alert("恭喜: "+winnerName+ " 抽中: "+priceName);
+      }
 
 
-      alert("恭喜: "+winnerName+ " 抽中: "+priceName);
     }
 
     //將array洗亂的function
@@ -858,7 +861,7 @@
 
 
  //繪製角子老虎機動畫效果的方法
- function doAnimation(text, chars){
+ function doAnimation(text, chars, drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName){
 
     //console.log(text);
     //console.log(chars);
@@ -869,7 +872,7 @@
     breaks = 0.001;  // Speed loss per frame
     endSpeed = 0.005;  // Speed at which the letter stops
     firstLetter = 240;  // Number of frames untill the first letter stopps (60 frames per second)
-    delay = 200;  // Number of frames between letters stopping
+    delay = 60;  // Number of frames between letters stopping
 
     canvas = document.querySelector('canvas');
     ctx = canvas.getContext('2d');
@@ -933,7 +936,7 @@
           if(!innerLoopDone){
             console.log("~~~~執行完doAnimation");
             innerLoopDone = true;
-            innerLoopDoneRun();
+            innerLoopDoneUpdateFirebase(drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
           }
         }
       }
@@ -941,8 +944,34 @@
       requestAnimationFrame(loop);
     });
 
-    function innerLoopDoneRun(){
-      console.log("~~~~執行完doAnimation!!!!!!!!");
+    function innerLoopDoneUpdateFirebase(drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName){
+
+      firebase.database().ref("users/"+drawnIndex).update(
+        updateParam ={
+          "WON": true,
+          "PID": priceID,
+          "PRICE": priceName
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
+
+      firebase.database().ref("priceList/"+drawnItemIndex).update(
+        updateParam ={
+          "WINNERid": winnerID,
+          "WINNERname": winnerName
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
+
+      alert("恭喜: "+winnerID+" "+winnerName+ " 抽中: "+priceName);
+
+
     }
 
 
