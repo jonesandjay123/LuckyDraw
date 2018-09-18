@@ -480,6 +480,13 @@
         //輪盤動畫要用到的3行。
         var textobj = [];
         textobj.push(winnerID); //必須要要傳一個陣列進去。
+
+        console.log("============所有checkbox: "+cbCount + " 所有被抽完的項目: "+doneCount);
+        if(cbCount - doneCount <=3){
+          textobj = winnerID.split('');
+          possibleWinnerIDList = '0123456789'.split('');
+        }
+
         //為了讓firebase update的動作接在動畫之後，只好把要更新的參數，全部放進動畫裡面，等值動畫結束後在裡面進行update...
         doAnimation(textobj, possibleWinnerIDList, drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
       }
@@ -868,10 +875,10 @@
 
     //text = '021573';  // The message displayed
     //chars = '0123456789';  // All possible Charactrers
-    scale = 50;  // Font size and overall scale
+    scale = 60;  // Font size and overall scale
     breaks = 0.001;  // Speed loss per frame
     endSpeed = 0.005;  // Speed at which the letter stops
-    firstLetter = 240;  // Number of frames untill the first letter stopps (60 frames per second)
+    firstLetter = 60;  // Number of frames untill the first letter stopps (60 frames per second)
     delay = 60;  // Number of frames between letters stopping
 
     canvas = document.querySelector('canvas');
@@ -933,8 +940,14 @@
           offsetV[i] = 0;
 
           //滾動完畢的標記點
-          if(!innerLoopDone){
+          if(!innerLoopDone && offsetV[text.length-1]==0){
             console.log("~~~~執行完doAnimation");
+            console.log(chars);
+            console.log(c);
+            console.log(chars[c]);
+            console.log(text);
+            //ctx.fillText(chars[c],scale*i,(j+o)*scale);
+            //ctx.fillText("Hello World!",scale*i,(j+o)*scale);
             innerLoopDone = true;
             innerLoopDoneUpdateFirebase(drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
           }
@@ -969,8 +982,7 @@
         }
       });
 
-      alert("恭喜: "+winnerID+" "+winnerName+ " 抽中: "+priceName);
-
+      //alert("恭喜: "+winnerID+" "+winnerName+ " 抽中: "+priceName);
 
     }
 
