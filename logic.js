@@ -477,7 +477,7 @@
 
       //如果是FortuneSlot.html(開獎頁面)，才要走進doAnimation。
       if(page == "FortuneSlot.html"){
-        //輪盤動畫要用到的3行。
+        //輪盤動畫要用到的2個陣列參數，先幫忙整理好。
         var textobj = [];
         textobj.push(winnerID); //必須要要傳一個陣列進去。
 
@@ -487,7 +487,7 @@
           possibleWinnerIDList = '0123456789'.split('');
         }
 
-        //為了讓firebase update的動作接在動畫之後，只好把要更新的參數，全部放進動畫裡面，等值動畫結束後在裡面進行update...
+        //為了讓firebase update的動作接在動畫之後，只好把要更新的參數，全部放進動畫裡面，等動畫結束後直接在裡面進行update...
         doAnimation(textobj, possibleWinnerIDList, drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
       }
       //若不是FortuneSlot.html的畫面的話，則抽獎完的update動作將是及時的。
@@ -539,7 +539,7 @@
       var cbCount = CBs.length; //找出所有checkbox
       var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
       if(doneCount >= cbCount){
-        alert("所有獎項皆已抽完!");
+        //alert("所有獎項皆已抽完!");
         return;
       }
 
@@ -740,6 +740,25 @@
             tbodyP.appendChild(tr);
             pTable.appendChild(tbodyP);
           }
+
+
+          //如果是FortuneSlot.html(開獎頁面)，才需要更新canvas
+          var path = window.location.pathname;
+          var page = path.split("/").pop();
+          if(page == "FortuneSlot.html"){
+            if(wTable.rows.length>1){
+              var lastWinnerID = wTable.rows[1].cells[1].innerHTML;
+              var lastWinnerName = wTable.rows[1].cells[2].innerHTML;
+
+              //先清空最上一層的繪製結果
+              canvas = document.querySelector('canvas');
+              ctx = canvas.getContext('2d');
+              ctx.clearRect(0, 0, 400, 250); // clears a text field 50 x 10, above baseline
+
+              updateWinnderOnCanvas(70, lastWinnerID, lastWinnerName);
+            }
+          }
+
           autoSelectLastItem(); //自動勾選最下方的可選獎項
         });
 
@@ -937,18 +956,12 @@
 
           //讓動畫內部的遞迴停止
           if(innerLoopDone){
-
             console.log("~~~~動畫已停止~~~~");
-
             //如果是在陣列模式下，就把他們轉回單一字串。
             if(text.length > 1){
               text = text.join(" "); //字和字之間，再保持一個space的距離，視覺效果更佳。
             }
-            //把篇移值全部回歸
-            ctx.globalAlpha = 1;
-            ctx.setTransform(1,0,0,1,0,0);
-            ctx.font = scale + 'px Helvetica'
-            ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+            updateWinnderOnCanvas(scale, text, winnerName); //更新最後中獎人畫面
             return;
           }
 
@@ -998,8 +1011,14 @@
       //alert("恭喜: "+winnerID+" "+winnerName+ " 抽中: "+priceName);
 
     }
+ }
 
-
-
-
+ //給抽獎陣列跟中獎人姓名，即可更新最後中獎畫面的方法
+ function updateWinnderOnCanvas(scale, text, winnerName){
+   //重新繪製canvas
+   ctx.globalAlpha = 1;
+   ctx.setTransform(1,0,0,1,0,0);
+   ctx.font = scale + 'px Helvetica'
+   ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+   ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
  }
