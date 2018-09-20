@@ -875,7 +875,7 @@
 
     //text = '021573';  // The message displayed
     //chars = '0123456789';  // All possible Charactrers
-    scale = 60;  // Font size and overall scale
+    scale = 70;  // Font size and overall scale
     breaks = 0.001;  // Speed loss per frame
     endSpeed = 0.005;  // Speed at which the letter stops
     firstLetter = 60;  // Number of frames untill the first letter stopps (60 frames per second)
@@ -909,12 +909,14 @@
     })();
 
     var innerLoopDone = false;
+
     requestAnimationFrame(loop = function(){
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.globalAlpha = 1;
       ctx.fillStyle = '#488';
       ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+
       for(var i=0;i<text.length;i++){
         ctx.fillStyle = '#ccc';
         ctx.textBaseline = 'middle';
@@ -932,6 +934,24 @@
           ctx.globalAlpha = s
           ctx.font = scale*s + 'px Helvetica'
           ctx.fillText(chars[c],scale*i,(j+o)*scale);
+
+          //讓動畫內部的遞迴停止
+          if(innerLoopDone){
+
+            console.log("~~~~動畫已停止~~~~");
+
+            //如果是在陣列模式下，就把他們轉回單一字串。
+            if(text.length > 1){
+              text = text.join(" "); //字和字之間，再保持一個space的距離，視覺效果更佳。
+            }
+            //把篇移值全部回歸
+            ctx.globalAlpha = 1;
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.font = scale + 'px Helvetica'
+            ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+            return;
+          }
+
         }
         offset[i] += offsetV[i];
         offsetV[i] -= breaks;
@@ -941,13 +961,6 @@
 
           //滾動完畢的標記點
           if(!innerLoopDone && offsetV[text.length-1]==0){
-            console.log("~~~~執行完doAnimation");
-            console.log(chars);
-            console.log(c);
-            console.log(chars[c]);
-            console.log(text);
-            //ctx.fillText(chars[c],scale*i,(j+o)*scale);
-            //ctx.fillText("Hello World!",scale*i,(j+o)*scale);
             innerLoopDone = true;
             innerLoopDoneUpdateFirebase(drawnIndex, priceID, priceName, drawnItemIndex, winnerID, winnerName);
           }
