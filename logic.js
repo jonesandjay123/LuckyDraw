@@ -919,6 +919,11 @@
     firstLetter = 60;  // Number of frames untill the first letter stopps (60 frames per second)
     delay = 60;  // Number of frames between letters stopping
 
+    //如果是單碼跑抽獎，速度要不同。
+    if(text.length==1){
+      firstLetter = 240;
+    }
+
     canvas = document.querySelector('canvas');
     ctx = canvas.getContext('2d');
 
