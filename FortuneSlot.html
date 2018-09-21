@@ -26,7 +26,7 @@
     top: 0px;
   }
 
-  #addEMP {
+  #executeDrawing {
     padding: 15px 25px;
     font-size: 24px;
     text-align: center;
@@ -39,9 +39,9 @@
     box-shadow: 0 9px #999;
   }
 
-  #addEMP:hover {background-color: #e65c00}
+  #executeDrawing:hover {background-color: #e65c00}
 
-  #addEMP:active {
+  #executeDrawing:active {
     background-color: #ff0000;
     box-shadow: 0 5px #666;
     transform: translateY(4px);
@@ -61,6 +61,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
   <script src="init.js"></script>
+  <script src="firebaseCRUDandExcel.js"></script>
   <script src="logic.js"></script>
 
   <script type="text/javascript">
@@ -103,8 +104,7 @@
 
           <div id="resultArea" style="float: right">
 
-            <button  id="addEMP" onclick="drawForWinner()">抽獎</button>
-            <!-- <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="doAnimation()">抽獎</button> -->
+            <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button>
             <br>
 
             <h5>中獎清單</h5>
