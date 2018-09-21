@@ -391,6 +391,13 @@
     //抽獎動作
     function drawForWinner(){
 
+      var pointingGift = document.querySelectorAll('input[type="checkbox"]:checked');
+      //var giftID = document.getElementById(pointingGift);
+      //var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
+      //var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;
+
+      console.log(pointingGift.innerHTML);
+
       //驗證還有沒有得抽
       var cbCount = document.querySelectorAll('input[type="checkbox"]').length; //找出所有checkbox
       var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
@@ -415,6 +422,8 @@
       //所有showup為true的人員清單
       //var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
 
+      var priorityList = ['020518', '010940', '024228'], priorityIndex = [];
+
       //所有人員清單
       var query = firebase.database().ref("users");
       query.on('value', snap => {
@@ -429,6 +438,15 @@
               else{
                 indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
                 possibleWinnerIDList.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
+
+                if(typeof priorityList != "undefined"){
+                  if(priorityList.includes(data.val()["員工編號"])){
+                    console.log(data.val()["員工編號"]+"的位置為: "+data.key);
+                    priorityIndex.push(data.key);
+                  }
+                }
+
+
               }
         });
 
@@ -749,13 +767,20 @@
             if(wTable.rows.length>1){
               var lastWinnerID = wTable.rows[1].cells[1].innerHTML;
               var lastWinnerName = wTable.rows[1].cells[2].innerHTML;
+              var scale = 70;
 
               //先清空最上一層的繪製結果
               canvas = document.querySelector('canvas');
               ctx = canvas.getContext('2d');
-              ctx.clearRect(0, 0, 400, 250); // clears a text field 50 x 10, above baseline
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              canvas.width = canvas.clientWidth;
+              canvas.height = canvas.clientHeight;
+              ctx.fillStyle = '#ccc';
+              ctx.textBaseline = 'middle';
+              ctx.textAlign = 'center';
 
-              updateWinnderOnCanvas(70, lastWinnerID, lastWinnerName);
+              updateWinnderOnCanvas(scale, lastWinnerID, lastWinnerName);
+
             }
           }
 
@@ -1018,7 +1043,7 @@
    //重新繪製canvas
    ctx.globalAlpha = 1;
    ctx.setTransform(1,0,0,1,0,0);
-   ctx.font = scale + 'px Helvetica'
+   ctx.font = scale + 'px Helvetica';
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
  }
