@@ -50,7 +50,7 @@
   .scrollit {
     overflow:scroll;
     width: 565px;
-    height:400px;
+    height:100vh;
   }
   </style>
 
@@ -68,7 +68,20 @@
     window.onload = function() {
       initApp();
       getListFromDB();
+      displayWindowSize(); //寬度偵測
     };
+    window.onresize = displayWindowSize;  //寬度改變時也要偵測寬度
+
+    //偵測寬度的事件
+    function displayWindowSize() {
+        myWidth = window.innerWidth;
+        if(myWidth <= 960){
+          var nFilter = document.getElementById('resultArea');
+          nFilter.style.paddingTop  = "230px";
+        }
+    };
+
+
 
   </script>
 </head>
