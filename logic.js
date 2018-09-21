@@ -759,12 +759,12 @@
             pTable.appendChild(tbodyP);
           }
 
-
           //如果是FortuneSlot.html(開獎頁面)，才需要更新canvas
           var path = window.location.pathname;
           var page = path.split("/").pop();
           if(page == "FortuneSlot.html"){
             if(wTable.rows.length>1){
+              var lastpriceName = wTable.rows[1].cells[0].innerHTML;
               var lastWinnerID = wTable.rows[1].cells[1].innerHTML;
               var lastWinnerName = wTable.rows[1].cells[2].innerHTML;
               var scale = 70;
@@ -779,8 +779,7 @@
               ctx.textBaseline = 'middle';
               ctx.textAlign = 'center';
 
-              updateWinnderOnCanvas(scale, lastWinnerID, lastWinnerName);
-
+              updateWinnderOnCanvas(scale, lastWinnerID, lastWinnerName, lastpriceName);
             }
           }
 
@@ -986,7 +985,7 @@
             if(text.length > 1){
               text = text.join(" "); //字和字之間，再保持一個space的距離，視覺效果更佳。
             }
-            updateWinnderOnCanvas(scale, text, winnerName); //更新最後中獎人畫面
+            updateWinnderOnCanvas(scale, text, winnerName, priceName); //更新最後中獎人畫面
             return;
           }
 
@@ -1039,11 +1038,12 @@
  }
 
  //給抽獎陣列跟中獎人姓名，即可更新最後中獎畫面的方法
- function updateWinnderOnCanvas(scale, text, winnerName){
+ function updateWinnderOnCanvas(scale, text, winnerName, priceName){
    //重新繪製canvas
    ctx.globalAlpha = 1;
    ctx.setTransform(1,0,0,1,0,0);
    ctx.font = scale + 'px Helvetica';
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
+   ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale);
  }
