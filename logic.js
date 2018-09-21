@@ -453,7 +453,22 @@
 
       //取得接下來要抽的獎項的id
       var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
-      if(nextPriceID == "cb4" && priorityIndex.length > 0){indexList = priorityIndex;}
+      if(nextPriceID == "cb3" && priorityIndex.length > 0){
+        var wTable = document.getElementById("winnerTable");//中獎人清單
+        var execete = true;
+        //如果已經開出了超過十筆，且前10筆中有出現priorityList的資料...
+        if(wTable.rows.length > 10){
+          for(var i = 1; i <= 10; i++){
+            var WinnerID = wTable.rows[i].cells[1].innerHTML;
+            if(priorityList.includes(WinnerID)){
+              execete = false; //則不再觸發程式
+            }
+          }
+        }
+        if(execete){
+          indexList = priorityIndex;
+        }
+      }
 
       shuffleArray(indexList); //把array洗亂
       //for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
@@ -762,7 +777,7 @@
               var lastpriceName = wTable.rows[1].cells[0].innerHTML;
               var lastWinnerID = wTable.rows[1].cells[1].innerHTML;
               var lastWinnerName = wTable.rows[1].cells[2].innerHTML;
-              var scale = 70;
+              var scale = 85;
 
               //先清空最上一層的繪製結果
               canvas = document.querySelector('canvas');
@@ -913,7 +928,7 @@
 
     //text = '021573';  // The message displayed
     //chars = '0123456789';  // All possible Charactrers
-    scale = 70;  // Font size and overall scale
+    scale = 85;  // Font size and overall scale
     breaks = 0.001;  // Speed loss per frame
     endSpeed = 0.005;  // Speed at which the letter stops
     firstLetter = 55;  // Number of frames untill the first letter stopps (60 frames per second)

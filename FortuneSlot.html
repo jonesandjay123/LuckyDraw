@@ -21,9 +21,15 @@
     /* height: 250px;
     width: 400px; */
     height: 300px;
-    width: 480px;
+    width: 580px;
     left: 0;
     top: 0px;
+  }
+
+  .scrollit {
+    overflow:scroll;
+    width: 565px;
+    height:400px;
   }
   </style>
 
@@ -81,7 +87,7 @@
             <br>
 
             <h5>中獎清單</h5>
-            <table id="winnerTable" style="padding-right: 100px;">
+            <table id="winnerTable" style="padding-right: 50px;">
               <tr>
                 <th>獎項:</th>
                 <th>工號:</th>
@@ -94,7 +100,7 @@
           <br><br><br><br><br><br><br><br><br>
 
           <!-- Container where we'll display the user details -->
-          <div class="quickstart-user-details-container">
+          <div class="quickstart-user-details-container scrollit">
             資料庫連線狀態: <span id="connection-status">Unknown</span>
             <br>
             <!-- <pre><code> -->
@@ -106,7 +112,8 @@
                   <th>中獎:</th>
                 </tr>
               </table>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <!-- <div class="scrollit"> -->
               <table id="priceTable" style="display: inline">
                 <tr>
                   <th>序號:</th>
@@ -115,7 +122,7 @@
                   <th>中獎人:</th>
                 </tr>
               </table>
-
+              <!-- </div> -->
             <!-- </code></pre> -->
           </div>
 
