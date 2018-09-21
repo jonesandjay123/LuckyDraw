@@ -15,11 +15,15 @@
   <style>
   canvas{
     position: absolute;
+    border: 1px solid #aaa;
+    border-radius: 15px;
     background: #111;
-    height: 250px;
-    width: 400px;
+    /* height: 250px;
+    width: 400px; */
+    height: 300px;
+    width: 480px;
     left: 0;
-    top: 80px;
+    top: 0px;
   }
   </style>
 
@@ -61,12 +65,12 @@
 
       <!-- Container for the demo -->
       <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-        <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
+        <!-- <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
           <h2 class="mdl-card__title-text">開獎頁面</h2>
-        </div>
+        </div> -->
 
         <canvas></canvas>
-
+        <br><br>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
           <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p>
 
@@ -77,7 +81,7 @@
             <br>
 
             <h5>中獎清單</h5>
-            <table id="winnerTable">
+            <table id="winnerTable" style="padding-right: 100px;">
               <tr>
                 <th>獎項:</th>
                 <th>工號:</th>
@@ -101,18 +105,8 @@
                   <th>姓名:</th>
                   <th>中獎:</th>
                 </tr>
-                <!-- <tr>
-                  <td>Jill</td>
-                  <td>Smith</td>
-                  <td>50</td>
-                </tr>
-                <tr>
-                  <td>Eve</td>
-                  <td>Jackson</td>
-                  <td>94</td>
-                </tr> -->
               </table>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <table id="priceTable" style="display: inline">
                 <tr>
                   <th>序號:</th>

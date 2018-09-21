@@ -916,12 +916,12 @@
     scale = 70;  // Font size and overall scale
     breaks = 0.001;  // Speed loss per frame
     endSpeed = 0.005;  // Speed at which the letter stops
-    firstLetter = 60;  // Number of frames untill the first letter stopps (60 frames per second)
+    firstLetter = 55;  // Number of frames untill the first letter stopps (60 frames per second)
     delay = 60;  // Number of frames between letters stopping
 
     //如果是單碼跑抽獎，速度要不同。
     if(text.length==1){
-      firstLetter = 240;
+      firstLetter = 330;
     }
 
     canvas = document.querySelector('canvas');
@@ -952,6 +952,16 @@
     })();
 
     var innerLoopDone = false;
+    var snd_win0 = new Audio("sounds/reel_stop.wav"); //抽獎中的音效0
+    var snd_win = new Audio("sounds/win.wav"); //中獎時的音效1
+    var drumRoll = new Audio("sounds/snare_drum_roll.mp3"); //抽獎中的音效
+
+    //抽獎中的音效
+    try {
+      drumRoll.currentTime = 0;
+      drumRoll.play();
+    }
+    catch(err) {};
 
     requestAnimationFrame(loop = function(){
       ctx.setTransform(1,0,0,1,0,0);
@@ -986,6 +996,16 @@
               text = text.join(" "); //字和字之間，再保持一個space的距離，視覺效果更佳。
             }
             updateWinnderOnCanvas(scale, text, winnerName, priceName); //更新最後中獎人畫面
+
+            //中獎時的音效
+            try {
+              snd_win0.currentTime = 0;
+              snd_win0.play();
+              snd_win.currentTime = 0;
+              snd_win.play();
+            }
+            catch(err) {};
+
             return;
           }
 
