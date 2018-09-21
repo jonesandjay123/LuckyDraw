@@ -391,13 +391,6 @@
     //抽獎動作
     function drawForWinner(){
 
-      var pointingGift = document.querySelectorAll('input[type="checkbox"]:checked');
-      //var giftID = document.getElementById(pointingGift);
-      //var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
-      //var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;
-
-      console.log(pointingGift.innerHTML);
-
       //驗證還有沒有得抽
       var cbCount = document.querySelectorAll('input[type="checkbox"]').length; //找出所有checkbox
       var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
@@ -421,8 +414,7 @@
 
       //所有showup為true的人員清單
       //var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
-
-      var priorityList = ['020518', '010940', '024228'], priorityIndex = [];
+      var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = [];
 
       //所有人員清單
       var query = firebase.database().ref("users");
@@ -441,11 +433,10 @@
 
                 if(typeof priorityList != "undefined"){
                   if(priorityList.includes(data.val()["員工編號"])){
-                    console.log(data.val()["員工編號"]+"的位置為: "+data.key);
+                    //console.log("發現: "+data.val()["員工編號"]+" 於 "+data.key);
                     priorityIndex.push(data.key);
                   }
                 }
-
 
               }
         });
@@ -459,6 +450,10 @@
         alert("所有出席者皆已有獎!! ");
         return;
       }
+
+      //取得接下來要抽的獎項的id
+      var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
+      if(nextPriceID == "cb4" && priorityIndex.length > 0){indexList = priorityIndex;}
 
       shuffleArray(indexList); //把array洗亂
       //for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
