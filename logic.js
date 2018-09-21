@@ -391,6 +391,8 @@
     //抽獎動作
     function drawForWinner(){
 
+      document.getElementById("addEMP").disabled = true; //按下去的瞬間disabled按鈕，避免連按兩下
+
       //驗證還有沒有得抽
       var cbCount = document.querySelectorAll('input[type="checkbox"]').length; //找出所有checkbox
       var doneCount = document.querySelectorAll('input[type="checkbox"]:disabled').length; //找出所有，被抽完的項目。
@@ -971,6 +973,7 @@
     var snd_win = new Audio("sounds/win.wav"); //中獎時的音效1
     var drumRoll = new Audio("sounds/snare_drum_roll.mp3"); //抽獎中的音效
 
+
     //抽獎中的音效
     try {
       drumRoll.currentTime = 0;
@@ -1020,6 +1023,8 @@
               snd_win.play();
             }
             catch(err) {};
+
+            document.getElementById("addEMP").disabled = false; //抽獎的按鈕鎖，解除
 
             return;
           }
