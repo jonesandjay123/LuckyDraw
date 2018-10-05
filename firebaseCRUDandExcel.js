@@ -344,30 +344,35 @@
     var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
     var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;
 
+
     if (!confirm("是否確定要讓出 "+winnerName+" 所獲得的 "+winnerPrice+"? ")){return;}
 
     //先抓到中獎人工號
     var userID = btn.id.substring(4); //把id中前4個win_的字元移除
+
+    console.log("userID: "+userID);
 
     //透過中獎人工號找到它們在資料庫中的位置
     var indexInUser = null, indexInPriceList = null;
 
     //找到users位置，並更新資料
     firebase.database().ref("users").orderByChild("員工編號").equalTo(userID).on("value", function(snapshot) {
+
       snapshot.forEach(function(data) {
+            console.log(data.key);
             indexInUser = data.key;
       });
-    });
-    firebase.database().ref("users/"+indexInUser).update(
-      updateParam ={
-        "PID": false,
-        "PRICE": false,
-        "WON": false
-      },function(error){
-      if(error){
-        alert("員工資料更新失敗!");
-        console.log("員工資料更新失敗!" + error);
-      }
+      firebase.database().ref("users/"+indexInUser).update(
+        updateParam ={
+          "PID": false,
+          "PRICE": false,
+          "WON": false
+        },function(error){
+        if(error){
+          alert("員工資料更新失敗!");
+          console.log("員工資料更新失敗!" + error);
+        }
+      });
     });
 
     //找到priceList位置，並更新資料
@@ -375,16 +380,16 @@
       snapshot.forEach(function(data) {
             indexInPriceList = data.key;
       });
-    });
-    firebase.database().ref("priceList/"+indexInPriceList).update(
-      updateParam ={
-        "WINNERid": false,
-        "WINNERname": false
-      },function(error){
-      if(error){
-        alert("中獎資料更新失敗!");
-        console.log("中獎資料更新失敗!" + error);
-      }
+      firebase.database().ref("priceList/"+indexInPriceList).update(
+        updateParam ={
+          "WINNERid": false,
+          "WINNERname": false
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
     });
   }
 

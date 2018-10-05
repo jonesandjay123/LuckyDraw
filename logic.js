@@ -23,12 +23,12 @@
     var indexList = []; //抽籤用的array
     var possibleWinnerIDList = []; //可能中獎的工號清單(doAnimation需要用到)
 
-    //所有showup為true的人員清單
-    //var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
     var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = [];
 
+    //所有showup為true的人員清單
+    var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
     //所有人員清單
-    var query = firebase.database().ref("users");
+    //var query = firebase.database().ref("users");
     query.on('value', snap => {
 
       attendenceCount = Object.size(snap.val()); //query結果的總數
@@ -212,8 +212,8 @@
       var workSheet = firebase.database().ref("users");
 
       //取得table中的全部資料(寫法A)
-      //var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
-      var query = workSheet.orderByValue(); //全部query的寫法
+      var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
+      //var query = workSheet.orderByValue(); //全部query的寫法
       query.on('value', snap => {
         //console.log("users的長度為: "+Object.size(snap.val()));
         //console.log(snap.val());
