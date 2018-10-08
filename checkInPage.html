@@ -17,20 +17,225 @@
   <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
   <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
 
- <!-- 讀Excel相關的引用 -->
- <script lang="javascript" src="dist/jszip.js"></script>
- <script lang="javascript" src="dist/xlsx.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
   <script src="init.js"></script>
-  <script src="firebaseCRUDandExcel.js"></script>
   <script src="logic.js"></script>
 
   <script type="text/javascript">
+
+  //繪製人員清單的table
+  function drawNameTable(database){
+
+    try {
+
+      var workSheet = firebase.database().ref("users");
+
+      //取得table中的全部資料(寫法A)
+      //var query = workSheet.orderByChild("SHOWUP").equalTo(true); //where SHOWUP = true的寫法
+      var query = workSheet.orderByValue(); //全部query的寫法
+      query.on('value', snap => {
+        //console.log("users的長度為: "+Object.size(snap.val()));
+        //console.log(snap.val());
+
+        var parsedData =snap.val();
+
+        var nTable = document.getElementById("nameTable");  //人員清單
+
+        //每次繪製前，先把Table的第一行以外的內容清空
+        for(var i = 1; i < nTable.rows.length;){
+            nTable.deleteRow(i);
+        }
+
+        var tbody = document.createElement("tbody"); //人員清單用
+
+        for(var i in parsedData){
+          //console.log(parsedData[i]["員工編號"] +" " +parsedData[i]["姓名"]);
+
+          //創建TR
+          var tr = document.createElement("tr"); //人員清單用
+
+          var winLabel = "";
+          //若抽中結果為true，就把字體、底色改變
+          if(parsedData[i].SHOWUP == true){
+            //====人員清單用=====================
+            tr.style.color = "red";
+            tr.style.backgroundColor = "yellow";
+            winLabel = "V";
+          }
+
+          //第一個TD
+          var td1 = document.createElement("td");
+          var txt1 = document.createTextNode(parsedData[i]["員工編號"]);
+          td1.appendChild(txt1);
+          tr.appendChild(td1);
+          //第二個TD
+          var td2 = document.createElement("td");
+          var txt2 = document.createTextNode(parsedData[i]["姓名"]);
+          td2.appendChild(txt2);
+          tr.appendChild(td2);
+          //第三個TD
+          var td3 = document.createElement("td");
+          var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示打勾
+          td3.appendChild(txt3);
+          tr.appendChild(td3);
+
+          //加進tbody跟table
+          tbody.appendChild(tr);
+          nTable.appendChild(tbody);
+        }
+
+      });
+
+    }
+    catch(err) {
+        alert("發生錯誤: "+err.message);
+    }
+  }
+
+  //根據執行種類(新、刪、修)工號、工單是否存在，來分配執行位置。
+  function executeAction(empNO, empName, dataExits, index){
+
+    console.log("在executeAction裡面的接收結果，工號:"+empNO+" 是否已存在:"+dataExits);
+
+    //工號有在系統裡
+    if(dataExits){
+
+      var updateParam = updateParam ={SHOWUP: true};
+
+      firebase.database().ref("users/"+index).update(updateParam,function(error){
+        if(error){
+          alert(empNO+"的資料報到失敗!");
+          console.log(empNO+"的資料更新失敗! error: " + error);
+        }
+        else{
+          alert(empNO+" 報到成功!");
+        }
+      });
+
+    }
+    //工號沒有在系統裡
+    else{
+
+      //然後使用者又沒有提供姓名
+      if(empName == null || empName == ""){ alert(" 資料庫中不存在工號:"+empNO+" \n 請輸入姓名，系統將立刻為您做資料建檔，並完成報到!"); return; }
+
+      var inputObj = {
+        "姓名": empName,
+        "員工編號": empNO,
+        WON: false,
+        PRICE: false,
+        PID: false,
+        SHOWUP: true
+      };
+
+        //撈取user底下的最下面一筆資料
+        firebase.database().ref("users").orderByValue().limitToLast(1).on("value", function(snapshot) {
+          snapshot.forEach(function(data) { index = data.key   });
+        });
+        index++; //index值++就是下一筆資料的位置
+
+        firebase.database().ref("users/"+index).set(inputObj,function(error){
+          if(error){
+            alert(empNO+"的資料寫入失敗!");
+            console.log(empNO+"的資料寫入失敗! error: " + error);
+          }
+          else{
+            alert("新資料建檔... \n 工號: "+empNO+" 姓名"+empName+"，已經登入完畢!");
+          }
+        });
+    }
+  }
+
+  //進資料庫驗證工號是否存在
+  function checkIDexits(empNO, empName, dataExits, index, callback){
+
+    var DBtype = "users";
+    var parameter = "員工編號";
+
+      //去資料庫中比對要輸入的名子是否已存在
+      firebase.database().ref(DBtype).on('value', snap => {
+
+       snap.forEach(function(data) {
+             //console.log("標題: " + data.key + "     內容:"+data.val()["員工編號"]);
+             if(data.val()[parameter] == empNO){
+               dataExits = true;
+               index = data.key; //位置記錄進去index
+             }
+       });
+   });
+   //console.log("在callback方法checkIDexits裡面的驗證結果，"+empNO+" 是否已存在:"+dataExits);
+   callback(empNO, empName, dataExits, index); //判斷完後，將判斷完的結果callback接續執行...
+
+  }
+
+  function sendInput(){
+
+    var empNO = document.getElementById("empNO").value.trim();
+    var empName = document.getElementById("empName").value.trim();
+
+    if(empNO == null || empNO == ""){ alert("員工編號為空!"); return; }
+
+    //alert("按下報到~");
+
+    var dataExits = false; //比對用的flag
+    var index = 0;  //用來標記資料位置的值(新刪修都用的到)
+
+    //執行callback
+    checkIDexits(empNO, empName, dataExits, index, executeAction);
+  }
+
+  function toggleFalse(){
+
+    var updates = {};
+    //https://stackoverflow.com/questions/34897576/how-to-update-all-children-in-firebase
+    firebase.database().ref("users").orderByValue().on("value", function(snapshot) {
+
+      snapshot.forEach(function(data) {
+         index = data.key
+         console.log(index);
+         updates["users/"+data.key+"/SHOWUP"] = false;
+       });
+
+
+       //snapshot.ref().update(updates);
+    });
+
+  }
+
+  function toggleTrue(){
+
+    var workSheet = firebase.database().ref("users");
+    var query = workSheet.orderByChild("SHOWUP").equalTo(false); //where SHOWUP = true的寫法
+    query.on('value', snap => {
+      snap.forEach(function(user) {
+        user.ref.child("SHOWUP").set(true);
+      });
+    });
+
+  }
+
+  function initApp() {
+
+    var database = firebase.database();
+
+    if(database != null){
+      console.log("===已和firebase取得連線===");
+      document.getElementById("connection-status").innerHTML = "已連線";
+      drawNameTable(database);
+    }
+    else{
+      alert("沒有連線到firebase...");
+      document.getElementById("connection-status").innerHTML = "連線失敗";
+    }
+  }
+
+
+
+
+
     window.onload = function() {
-      checkfileType();
       initApp();
-      getListFromDB();
     };
   </script>
 </head>
@@ -60,37 +265,16 @@
         </div>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
 
-          <div id="resultArea" style="float: right">
-
-            <button class="mdl-button mdl-js-button mdl-button--raised" id="executeDraw" onclick="drawForWinner()">抽獎</button>
-            <br>
-
-            <h5>中獎清單</h5>
-            <table id="winnerTable">
-              <tr>
-                <th>獎項:</th>
-                <th>工號:</th>
-                <th>姓名:</th>
-                <th>-</th>
-              </tr>
-            </table>
-          </div>
-
-          <form>
-            <input type="radio" name="fileType" onclick="checkfileType()" value="empListRadio">員工清單<br>
-            <input type="radio" name="fileType" onclick="checkfileType()" value="priceListRadio" checked="checked">獎項清單<br>
-          </form>
           <br/><br/>
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empNO" placeholder="員工編號"/>
           &nbsp;&nbsp;&nbsp;
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="empName" placeholder="員工姓名"/>
-          <br/><br/>
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="sendInput('add')">新增</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="editEMP" onclick="sendInput('edit')">修改</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="sendInput()">報到</button>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="toggleFalse()">all False</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="deleteEMP" onclick="sendInput('delete')">移除</button>
-
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="toggleTrue()">all True</button>
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
@@ -104,7 +288,7 @@
                 <tr>
                   <th>工號:</th>
                   <th>姓名:</th>
-                  <th>中獎:</th>
+                  <th>報到:</th>
                 </tr>
                 <!-- <tr>
                   <td>Jill</td>
@@ -117,15 +301,7 @@
                   <td>94</td>
                 </tr> -->
               </table>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <table id="priceTable" style="display: inline">
-                <tr>
-                  <th>序號:</th>
-                  <th>中獎:</th>
-                  <th>中獎工號:</th>
-                  <th>中獎人:</th>
-                </tr>
-              </table>
+
 
             <!-- </code></pre> -->
           </div>
