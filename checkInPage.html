@@ -186,33 +186,25 @@
   }
 
   function toggleFalse(){
-
     var updates = {};
-    //https://stackoverflow.com/questions/34897576/how-to-update-all-children-in-firebase
     firebase.database().ref("users").orderByValue().on("value", function(snapshot) {
-
       snapshot.forEach(function(data) {
          index = data.key
-         console.log(index);
          updates["users/"+data.key+"/SHOWUP"] = false;
        });
-
-
-       //snapshot.ref().update(updates);
     });
-
+    return firebase.database().ref().update(updates);
   }
 
   function toggleTrue(){
-
-    var workSheet = firebase.database().ref("users");
-    var query = workSheet.orderByChild("SHOWUP").equalTo(false); //where SHOWUP = true的寫法
-    query.on('value', snap => {
-      snap.forEach(function(user) {
-        user.ref.child("SHOWUP").set(true);
-      });
+    var updates = {};
+    firebase.database().ref("users").orderByValue().on("value", function(snapshot) {
+      snapshot.forEach(function(data) {
+         index = data.key
+         updates["users/"+data.key+"/SHOWUP"] = true;
+       });
     });
-
+    return firebase.database().ref().update(updates);
   }
 
   function initApp() {
@@ -231,11 +223,27 @@
   }
 
 
-
-
-
     window.onload = function() {
       initApp();
+
+      //累計點擊次數，連點超過八下切換一次。
+      var something = document.getElementById('secretFunc');
+      var count = 0;
+      something.onclick = function () {
+        if (count >= 7) {
+            var fbtn = document.getElementById('allFalse');
+            var tbtn = document.getElementById('allTrue');
+            if (fbtn.style.display === "none") {
+                fbtn.style.display = "block";
+                tbtn.style.display = "block";
+            } else {
+                fbtn.style.display = "none";
+                tbtn.style.display = "none";
+            }
+            count = 0;
+        } else count++
+      };
+
     };
   </script>
 </head>
@@ -261,7 +269,7 @@
       <!-- Container for the demo -->
       <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
         <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
-          <h2 class="mdl-card__title-text">報到頁面</h2>
+          <h2 id="secretFunc" class="mdl-card__title-text">報到頁面</h2>
         </div>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
 
@@ -272,9 +280,9 @@
           &nbsp;&nbsp;&nbsp;
           <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="sendInput()">報到</button>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="toggleFalse()">all False</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="allFalse" onclick="toggleFalse()" style="display:none">all False</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="toggleTrue()">all True</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="allTrue" onclick="toggleTrue()" style="display:none">all True</button>
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
