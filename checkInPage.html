@@ -21,6 +21,7 @@
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
   <script src="init.js"></script>
   <script src="logic.js"></script>
+  <script src="dist/jquery-3.3.1.slim.min.js"></script>
 
   <script type="text/javascript">
 
@@ -110,6 +111,10 @@
         }
         else{
           alert(empNO+" 報到成功!");
+          //清空輸入欄位
+          document.getElementById("empNO").value = "";
+          document.getElementById("empName").value = "";
+          $( "#empNO" ).focus(); //jqery的自動選中
         }
       });
 
@@ -142,6 +147,10 @@
           }
           else{
             alert("新資料建檔... \n 工號: "+empNO+" 姓名"+empName+"，已經登入完畢!");
+            //清空輸入欄位
+            document.getElementById("empNO").value = "";
+            document.getElementById("empName").value = "";
+            $( "#empNO" ).focus(); //jqery的自動選中
           }
         });
     }
@@ -174,7 +183,7 @@
     var empNO = document.getElementById("empNO").value.trim();
     var empName = document.getElementById("empName").value.trim();
 
-    if(empNO == null || empNO == ""){ alert("員工編號為空!"); return; }
+    if(empNO == null || empNO == ""){ alert("員工編號為空!");  $( "#empNO" ).focus(); return; }
 
     //alert("按下報到~");
 
@@ -231,20 +240,23 @@
       var count = 0;
       something.onclick = function () {
         if (count >= 7) {
-            var fbtn = document.getElementById('allFalse');
-            var tbtn = document.getElementById('allTrue');
-            if (fbtn.style.display === "none") {
-                fbtn.style.display = "block";
-                tbtn.style.display = "block";
-            } else {
-                fbtn.style.display = "none";
-                tbtn.style.display = "none";
-            }
-            count = 0;
+          //切換顯示(jquery的寫法)
+          $( "#allFalse" ).toggle( "slow" );
+          $( "#allTrue" ).toggle( "slow" );
+          count = 0;
         } else count++
       };
 
+      $( "#empNO" ).focus(); //jqery的自動選中
     };
+
+    $(document).keyup(function (e) {
+        if ($(".input1:focus") && (e.keyCode === 13)) {
+           //alert('ya!');
+           sendInput();
+        }
+     });
+
   </script>
 </head>
 <body>
