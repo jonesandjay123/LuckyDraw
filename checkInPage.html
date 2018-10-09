@@ -195,6 +195,10 @@
   }
 
   function toggleFalse(){
+
+    var r = confirm(" 這將會影響到整個資料庫的內容! \n 是否確定要執行?");
+    if (r != true) {return;}
+
     var updates = {};
     firebase.database().ref("users").orderByValue().on("value", function(snapshot) {
       snapshot.forEach(function(data) {
@@ -206,6 +210,10 @@
   }
 
   function toggleTrue(){
+
+    var r = confirm(" 這將會影響到整個資料庫的內容! \n 是否確定要執行?");
+    if (r != true) {return;}
+
     var updates = {};
     firebase.database().ref("users").orderByValue().on("value", function(snapshot) {
       snapshot.forEach(function(data) {
@@ -292,17 +300,15 @@
           &nbsp;&nbsp;&nbsp;
           <button class="mdl-button mdl-js-button mdl-button--raised" id="addEMP" onclick="sendInput()">報到</button>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="allFalse" onclick="toggleFalse()" style="display:none">all False</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="allFalse" onclick="toggleFalse()" style="display:none">全部未到</button>
           &nbsp;&nbsp;&nbsp;
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="allTrue" onclick="toggleTrue()" style="display:none">all True</button>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="allTrue" onclick="toggleTrue()" style="display:none">全部抵達</button>
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
             資料庫連線狀態: <span id="connection-status">Unknown</span>
             <br>
             <!-- <pre><code> -->
-            <p>要記得將users table的初始化改成showUP = false</p>
-            <p>要記得在此頁面做一個可以立刻toggle showUP = true或false的快捷功能</p>
 
               <table id="nameTable" style="display: inline">
                 <tr>
