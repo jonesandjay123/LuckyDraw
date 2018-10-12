@@ -204,6 +204,31 @@
 
   }
 
+  //自動滾動至對應文字的欄位
+  function scrollIntoView(text) {
+    var tableRow = $("td").filter(function() {
+        return $(this).text() == text;
+    }).closest("tr").css('color','black').css('font-weight','bold').css('background-color', 'orange');
+
+    //因為畫面最後會取回3個tableRow，而我們只要1、2號結果的position來跳轉位置。
+    var count = 0;
+    var position = 0;
+    tableRow.each( function() {
+      if(count == 1){
+        var $currentJqueryElement = $(this);
+        position = $currentJqueryElement.position().top;
+        document.getElementById('innerLeft').scrollTop = position -100;
+      }
+      if(count == 2){
+        var $currentJqueryElement = $(this);
+        position = $currentJqueryElement.position().top;
+        document.getElementById('innerRight').scrollTop = position- 100;
+      }
+      count++;
+    });
+    //document.getElementById('innerLeft').scrollTop = tableRow.position().top + 25;
+  }
+
   //繪製人員清單的table
   function drawNameTable(database){
 
@@ -606,4 +631,9 @@
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
    ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale);
+   var path = window.location.pathname;
+   var page = path.split("/").pop();
+   if(page == "FortuneSlot.html"){
+     scrollIntoView(winnerName); //自動滾動至對應文字的欄位
+   }
  }

@@ -20,8 +20,8 @@
     background: #111;
     /* height: 250px;
     width: 400px; */
-    height: 300px;
-    width: 580px;
+    height: 260px;
+    width: 620px;
     left: 0;
     top: 0px;
   }
@@ -48,9 +48,32 @@
   }
 
   .scrollit {
+    /*
     overflow:scroll;
-    width: 565px;
-    height:100vh;
+    */
+    width: 600px;
+    height:45vh;
+    /* border: 2px solid red; */
+    float:left;
+    top:0;
+    bottom:0;
+    /* position:absolute; */
+  }
+  #innerLeft {
+      max-height:90%;
+      overflow-y:auto;
+      /* border: 2px solid blue; */
+      width:200px;
+      margin-right:2%;
+      float:left;
+  }
+  #innerRight {
+      max-height:90%;
+      overflow-y:auto;
+      /* border: 2px solid blue; */
+      width:350px;
+      margin-right:2%;
+      float:left;
   }
   </style>
 
@@ -63,6 +86,7 @@
   <script src="init.js"></script>
   <script src="firebaseCRUDandExcel.js"></script>
   <script src="logic.js"></script>
+  <script src="dist/jquery-3.3.1.slim.min.js"></script>
 
   <script type="text/javascript">
     window.onload = function() {
@@ -113,15 +137,15 @@
         <canvas></canvas>
         <br><br>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-          <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p>
+          <!-- <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p> -->
 
-          <div id="resultArea" style="float: right">
+          <div id="resultArea" style="float: right" >
 
             <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button>
             <br>
 
             <h5>中獎清單</h5>
-            <table id="winnerTable" style="padding-right: 50px;">
+            <table id="winnerTable" style="padding-right: 10px;">
               <tr>
                 <th>獎項:</th>
                 <th>工號:</th>
@@ -135,10 +159,10 @@
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container scrollit">
-            資料庫連線狀態: <span id="connection-status">Unknown</span>
+            <span id="connection-status" style="visibility: hidden">Unknown</span>
             <br>
             <!-- <pre><code> -->
-
+            <div id="innerLeft" style="display: inline">
               <table id="nameTable" style="display: inline">
                 <tr>
                   <th>工號:</th>
@@ -146,8 +170,9 @@
                   <th>中獎:</th>
                 </tr>
               </table>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
               <!-- <div class="scrollit"> -->
+            <div id="innerRight" style="display: inline">
               <table id="priceTable" style="display: inline">
                 <tr>
                   <th>序號:</th>
@@ -156,6 +181,7 @@
                   <th>中獎人:</th>
                 </tr>
               </table>
+            </div>
               <!-- </div> -->
             <!-- </code></pre> -->
           </div>
