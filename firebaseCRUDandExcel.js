@@ -17,7 +17,7 @@
   function exportResult(){
 
     //所有showup為true的人員清單
-    var query = firebase.database().ref("users").orderByChild("WON").equalTo(true);
+    var query = firebase.database().ref("priceList").orderByValue();
 
     var keepdoing = true;
     var data = []; //陣列物件
@@ -25,37 +25,41 @@
     query.on('value', snap => {
 
       if(Object.size(snap.val()) <= 0){
-        alert("沒有人中獎!");
+        alert("獎品清單是空的!");
         keepdoing = false;
         return;
       }
 
       snap.forEach(function(result) {
+
+         var userID = (result.val()["WINNERid"] == false) ? "": result.val()["WINNERid"];
+         var userName = (result.val()["WINNERname"] == false) ? "": result.val()["WINNERname"];
+
           var obj = {
-            "獎項": result.val()["PRICE"],
-            "工號": result.val()["員工編號"],
-            "姓名": result.val()["姓名"]
+            "獎項": result.val()["獎項"],
+            "工號": userID,
+            "姓名": userName
           };
           data.push(obj);  //把obj塞入陣列
       });
+
+      if(!keepdoing){ return;}
+
+      // a this line is only needed if you are not adding a script tag reference
+      if(typeof XLSX == 'undefined') XLSX = require('xlsx');
+
+      // a make the worksheet
+      var ws = XLSX.utils.json_to_sheet(data);
+
+      // add to workbook
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "People");
+
+      // agenerate an XLSX file
+      XLSX.writeFile(wb, "中獎名單.xlsx");
+
+      console.log("匯出成功~"+data);
     });
-
-    if(!keepdoing){ return;}
-
-    // a this line is only needed if you are not adding a script tag reference
-    if(typeof XLSX == 'undefined') XLSX = require('xlsx');
-
-    // a make the worksheet
-    var ws = XLSX.utils.json_to_sheet(data);
-
-    // add to workbook
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "People");
-
-    // agenerate an XLSX file
-    XLSX.writeFile(wb, "中獎名單.xlsx");
-
-    console.log("匯出成功~"+data);
 
 
   }
