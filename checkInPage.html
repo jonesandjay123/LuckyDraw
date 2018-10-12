@@ -264,8 +264,9 @@
       something.onclick = function () {
         if (count >= 7) {
           //切換顯示(jquery的寫法)
-          $( "#allFalse" ).toggle( "slow" );
-          $( "#allTrue" ).toggle( "slow" );
+          $( "#allFalse" ).toggle( "show" );
+          $( "#allTrue" ).toggle( "show" );
+          $( "#siteURL" ).toggle( "show" );
           count = 0;
         } else count++
       };
@@ -290,6 +291,8 @@
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--8-col-desktop">
         <a href="/"><h3>尾牙抽獎系統</h3></a>
+        &nbsp;&nbsp;&nbsp;
+        <img id="siteURL" src="barcode.gif" alt="siteURL" height="100" width="100" style="display:none">
       </div>
 
       <form action="index.html">
@@ -318,6 +321,7 @@
           <button class="mdl-button mdl-js-button mdl-button--raised" id="allFalse" onclick="toggleFalse()" style="display:none">全部未到</button>
           &nbsp;&nbsp;&nbsp;
           <button class="mdl-button mdl-js-button mdl-button--raised" id="allTrue" onclick="toggleTrue()" style="display:none">全部抵達</button>
+
 
           <!-- Container where we'll display the user details -->
           <div id="scrollContainer" class="quickstart-user-details-container" style="width:450px">
