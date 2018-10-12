@@ -29,7 +29,7 @@
   function scrollIntoView(text) {
     var tableRow = $("td").filter(function() {
         return $(this).text() == text;
-    }).closest("tr");
+    }).closest("tr").css('color','black').css('font-weight','bold').css('background-color', 'orange');
     document.getElementById('scrollContainer').scrollTop = tableRow.position().top + 25;
   }
 
