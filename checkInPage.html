@@ -25,6 +25,14 @@
 
   <script type="text/javascript">
 
+  //自動滾動至對應文字的欄位
+  function scrollIntoView(text) {
+    var tableRow = $("td").filter(function() {
+        return $(this).text() == text;
+    }).closest("tr");
+    document.getElementById('scrollContainer').scrollTop = tableRow.position().top + 25;
+  }
+
   //繪製人員清單的table
   function drawNameTable(database){
 
@@ -85,7 +93,12 @@
           tbody.appendChild(tr);
           nTable.appendChild(tbody);
         }
-
+        var tableHeight = document.getElementById('scrollContainer').offsetHeight;
+        console.log("table的高度為: "+tableHeight);
+        if(tableHeight > 317){
+          document.getElementById('scrollContainer').style.height = "317px"; //高度限定
+          $('#scrollContainer').css("overflow-y", "scroll"); //加上Y軸的拉霸
+        }
       });
 
     }
@@ -110,6 +123,7 @@
           console.log(empNO+"的資料更新失敗! error: " + error);
         }
         else{
+          scrollIntoView(document.getElementById("empNO").value); //自動滾動至對應文字的欄位
           alert(empNO+" 報到成功!");
           //清空輸入欄位
           document.getElementById("empNO").value = "";
@@ -146,6 +160,7 @@
             console.log(empNO+"的資料寫入失敗! error: " + error);
           }
           else{
+            scrollIntoView(document.getElementById("empNO").value); //自動滾動至對應文字的欄位
             alert("新資料建檔... \n 工號: "+empNO+" 姓名"+empName+"，已經登入完畢!");
             //清空輸入欄位
             document.getElementById("empNO").value = "";
@@ -305,7 +320,7 @@
           <button class="mdl-button mdl-js-button mdl-button--raised" id="allTrue" onclick="toggleTrue()" style="display:none">全部抵達</button>
 
           <!-- Container where we'll display the user details -->
-          <div class="quickstart-user-details-container">
+          <div id="scrollContainer" class="quickstart-user-details-container" style="width:450px">
             資料庫連線狀態: <span id="connection-status">Unknown</span>
             <br>
             <!-- <pre><code> -->

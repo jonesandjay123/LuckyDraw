@@ -53,7 +53,7 @@
 
       // add to workbook
       var wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "People");
+      XLSX.utils.book_append_sheet(wb, ws, "中獎名單");
 
       // agenerate an XLSX file
       XLSX.writeFile(wb, "中獎名單.xlsx");
