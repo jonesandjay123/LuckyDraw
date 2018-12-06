@@ -23,7 +23,7 @@
     var indexList = []; //抽籤用的array
     var possibleWinnerIDList = []; //可能中獎的工號清單(doAnimation需要用到)
 
-    var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = [];
+    //var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = []; //開啟本行後，同時開啟44~51，67~84。
 
     //所有showup為true的人員清單
     var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
@@ -41,14 +41,14 @@
             else{
               indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
               possibleWinnerIDList.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
-
+              /*
               if(typeof priorityList != "undefined"){
                 if(priorityList.includes(data.val()["員工編號"])){
                   //console.log("發現: "+data.val()["員工編號"]+" 於 "+data.key);
                   priorityIndex.push(data.key);
                 }
               }
-
+              */
             }
       });
 
@@ -64,6 +64,7 @@
 
     //取得接下來要抽的獎項的id
     var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
+    /*
     if(nextPriceID == "cb3" && priorityIndex.length > 0){
       var wTable = document.getElementById("winnerTable");//中獎人清單
       var execete = true;
@@ -80,7 +81,7 @@
         indexList = priorityIndex;
       }
     }
-
+    */
     shuffleArray(indexList); //把array洗亂
     //for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
 

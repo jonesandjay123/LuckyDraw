@@ -393,6 +393,10 @@
           alert("中獎資料更新失敗!");
           console.log("中獎資料更新失敗!" + error);
         }
+      })
+      //完成後，強制刷新頁面，避免下一次使用讓出時，出現失效的堆疊狀況。
+      .then(function onSuccess(res) {
+        location.reload();
       });
     });
   }
