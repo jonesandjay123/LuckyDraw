@@ -369,21 +369,25 @@
           //第一個TD
           var td1 = document.createElement("td");
           var txt1 = document.createTextNode(parsedData[i]["編號"]);
+          td1.classList.add("text-center");
           td1.appendChild(txt1);
           tr.appendChild(td1);
           //第二個TD
           var td2 = document.createElement("td");
           var txt2 = document.createTextNode(parsedData[i]["獎項"]);
+          td2.classList.add("text-center");
           td2.appendChild(txt2);
           tr.appendChild(td2);
           //第三個TD
           var td3 = document.createElement("td");
           var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示id
+          td3.classList.add("text-center");
           td3.appendChild(txt3);
           tr.appendChild(td3);
           //第四個TD
           var td4 = document.createElement("td");
           var txt4 = document.createTextNode(winLabel2);  //用winLabel2來切換是否顯示name
+          td4.classList.add("text-center");
           td4.appendChild(txt4);
           tr.appendChild(td4);
 
