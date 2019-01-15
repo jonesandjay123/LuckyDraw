@@ -80,6 +80,14 @@
       margin-right:2%;
       float:left;
   }
+  #resultBox {
+      max-height:500px;
+      overflow-y:auto;
+      /* border: 2px solid blue; */
+      width:350px;
+      margin-right:2%;
+      float:left;
+  }
 
   .mdl-layout__header {
       display: flex;
@@ -234,14 +242,16 @@
                 <br>
 
                 <h5>中獎清單</h5>
-                <table id="winnerTable" style="padding-right: 10px;">
+                <div id="resultBox" style="display: inline; width: 100%">
+                <table id="winnerTable" style="padding-right: 10px;display: inline;">
                   <tr>
-                    <th>獎項:</th>
+                    <th style="width: 100px" class="text-center">獎項:</th>
                     <th>工號:</th>
                     <th>姓名:</th>
                     <th>-</th>
                   </tr>
                 </table>
+                </div>
               </div>
 
             </div>

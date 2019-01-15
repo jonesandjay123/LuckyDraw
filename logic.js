@@ -335,6 +335,7 @@
             //第一個TD
             var td1W = document.createElement("td");
             var txt1W = document.createTextNode(parsedData[i]["獎項"]);
+            td1W.classList.add("text-center");
             td1W.appendChild(txt1W);
             trW.appendChild(td1W);
             //第二個TD
