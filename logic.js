@@ -223,7 +223,7 @@
       if(count == 2){
         var $currentJqueryElement = $(this);
         position = $currentJqueryElement.position().top;
-        document.getElementById('innerRight').scrollTop = position- 100;
+        document.getElementById('innerRight').scrollTop = position +50;
       }
       count++;
     });
@@ -642,5 +642,6 @@
    var page = path.split("/").pop();
    if(page == "FortuneSlot.html"){
      scrollIntoView(winnerName); //自動滾動至對應文字的欄位
+     document.getElementById("executeDrawing").setAttribute('src','button1.png');
    }
  }
