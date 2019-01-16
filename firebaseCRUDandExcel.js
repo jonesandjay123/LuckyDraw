@@ -80,6 +80,12 @@
         obj[i].PRICE = false;
         obj[i].PID = false;
         obj[i].SHOWUP = true;
+        if(typeof obj[i].isSpecial === "undefined"){
+          obj[i].isSpecial = true;
+        }
+        else{
+          obj[i].isSpecial = false;
+        }
       }
 
       //把物件寫入資料庫
@@ -175,10 +181,11 @@
       var inputObj = {
         "姓名": empName,
         "員工編號": empNO,
+        isSpecial: false,
         WON: false,
         PRICE: false,
         PID: false,
-        SHOWUP: false
+        SHOWUP: true
       };
 
     }
