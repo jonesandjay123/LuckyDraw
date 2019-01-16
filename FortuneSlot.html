@@ -25,13 +25,13 @@
     background: #111;
     /* height: 250px;
     width: 400px; */
-    height: 290px;
-    width: 680px;
+    height: 260px;
+    width: 620px;
     left: 0;
     top: 0px;
   }
 
-  #executeDrawing {
+  /* #executeDrawing {
     padding: 15px 25px;
     font-size: 24px;
     text-align: center;
@@ -50,7 +50,7 @@
     background-color: #ff0000;
     box-shadow: 0 5px #666;
     transform: translateY(4px);
-  }
+  } */
 
   .scrollit {
     /*
@@ -77,11 +77,11 @@
       overflow-y:auto;
       /* border: 2px solid blue; */
       width:350px;
-      margin-right:2%;
+      margin-left:2%;
       float:left;
   }
   #resultBox {
-      max-height:500px;
+      max-height:450px;
       overflow-y:auto;
       /* border: 2px solid blue; */
       width:350px;
@@ -123,8 +123,8 @@
       background-size: 100%;
   }
 
-  #priceTable th{
-
+  #priceTable tr{
+    background-color: #f5f5f5;
   }
 
   </style>
@@ -166,13 +166,13 @@
 
   <!-- Header section containing title -->
   <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700" id="pageHeader">
+    <img src="newLogo.png" style="position: absolute; left: 1.8%; top: 1.5%; width:15%">
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--8-col-desktop">
-        <a href="/"><h3>尾牙抽獎系統</h3></a>
       </div>
 
       <form action="index.html">
-          <input type="submit" value="管理員模式" style="position: absolute; right: 0;" />
+          <input type="submit" value="管理員模式" style="position: absolute; right: 0; top:0" />
       </form>
     </div>
   </header>
@@ -186,19 +186,19 @@
           <h2 class="mdl-card__title-text">開獎頁面</h2>
         </div> -->
 
-        <div class="container" >
+        <div class="container" style="margin-top: 6%" >
 
-          <div class="row">
-            <div class="border border-primary col-8">
+          <div class="row" style="background-image: linear-gradient(to right, #2A0549 , #E5002D);border-radius: 25px;">
+            <div class="col-8">
 
-              <canvas></canvas>
+              <canvas style="margin-top:3%;margin-left:3%"></canvas>
               <br><br>
               <div class="mdl-card__supporting-text mdl-color-text--grey-600">
                 <!-- <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p> -->
 
 
 
-                <br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br><br><br><br>
 
                 <!-- Container where we'll display the user details -->
                 <div class="quickstart-user-details-container scrollit">
@@ -215,13 +215,14 @@
                     </table>
                   </div>
                     <!-- <div class="scrollit"> -->
-                  <div id="innerRight" style="display: inline; width: 100%">
+                  <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
                     <table id="priceTable" style="display: inline;">
                       <tr>
                         <th style="width: 100px" class="text-center">序號:</th>
-                        <th style="width: 300px" class="text-center">獎項:</th>
+                        <th style="width: 250px" class="text-center">獎項:</th>
                         <th style="width: 100px" class="text-center">中獎工號:</th>
                         <th style="width: 150px" class="text-center">中獎人:</th>
+                        <th></th>
                       </tr>
                     </table>
                   </div>
@@ -234,24 +235,30 @@
 
             </div>
 
-            <div class="border border-primary col-4">
+            <div class="col-4">
 
-              <div id="resultArea" style="float: right" >
+              <div id="resultArea" >
 
-                <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button>
-                <br>
-
-                <h5>中獎清單</h5>
-                <div id="resultBox" style="display: inline; width: 100%">
-                <table id="winnerTable" style="padding-right: 10px;display: inline;">
-                  <tr>
-                    <th style="width: 100px" class="text-center">獎項:</th>
-                    <th>工號:</th>
-                    <th>姓名:</th>
-                    <th>-</th>
-                  </tr>
-                </table>
+                <div class="row">
+                  <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
+                    <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
+                  <table id="winnerTable" style="padding-right: 25px;display: inline;">
+                    <tr>
+                      <th style="width: 140px" class="text-center">獎項:</th>
+                      <th>工號:</th>
+                      <th>姓名:</th>
+                      <th></th>
+                    </tr>
+                  </table>
+                  </div>
                 </div>
+
+                <div class="row">
+                  <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
+                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawForWinner();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
+                  <br>
+                </div>
+
               </div>
 
             </div>

@@ -346,6 +346,7 @@
             //第三個TD
             var td3W = document.createElement("td");
             var txt3W = document.createTextNode(parsedData[i].WINNERname);  //用winLabel來切換是否顯示打勾
+            td3W.setAttribute("style", "font-family:Microsoft JhengHei;font-weight:bold");
             td3W.appendChild(txt3W);
             trW.appendChild(td3W);
 
