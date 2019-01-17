@@ -31,27 +31,6 @@
     top: 0px;
   }
 
-  /* #executeDrawing {
-    padding: 15px 25px;
-    font-size: 24px;
-    text-align: center;
-    cursor: pointer;
-    outline: none;
-    color: #fff;
-    background-color: #ff6600;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 9px #999;
-  }
-
-  #executeDrawing:hover {background-color: #e65c00}
-
-  #executeDrawing:active {
-    background-color: #ff0000;
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-  } */
-
   .scrollit {
     /*
     overflow:scroll;
@@ -142,9 +121,9 @@
 
   <script type="text/javascript">
     window.onload = function() {
-      initApp();
-      getListFromDB();
-      displayWindowSize(); //寬度偵測
+      // initApp();
+      // getListFromDB();
+      // displayWindowSize(); //寬度偵測
     };
     window.onresize = displayWindowSize;  //寬度改變時也要偵測寬度
 
@@ -156,6 +135,132 @@
           nFilter.style.paddingTop  = "230px";
         }
     };
+
+
+
+
+    var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = [];
+    var scale = 75;  // Font size and overall scale
+
+    function lotto(){
+      //參考http://www.dynamicdrive.com/dynamicindex12/lottery.htm
+
+      //將array洗亂的function
+      for (var i = priorityList.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = priorityList[i];
+          priorityList[i] = priorityList[j];
+          priorityList[j] = temp;
+      }
+
+      //console.log("====priorityList: "+priorityList.toString());
+      OutPut = priorityList[0];
+
+      //將滾動的結果顯示在畫布上
+      canvas = document.querySelector('canvas');
+      if (canvas.getContext) {
+        //加下面兩行，字體的銳利度才會正常!
+        canvas.width = canvas.getBoundingClientRect().width;
+        canvas.height = canvas.getBoundingClientRect().height;
+
+        var ctx = canvas.getContext("2d");
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#ccc';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.font = scale + 'px Helvetica';
+        ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+      }
+
+
+      T=setTimeout('lotto()',20);
+    }
+    function StOp(){
+    // setTimeout('clearTimeout(T)',1000);
+    setTimeout('clearTimeout(T)',0);
+    }
+
+
+    //將array洗亂的function
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    var startFlag = false;
+
+    function toggleSound() {
+
+      //音效的切換
+      var audioElem = document.getElementById('audio');
+      audioElem.loop = true;
+      if (audioElem.paused)
+        audioElem.play();
+      else{
+        audioElem.pause();
+
+        //加入停止的額外音效
+        var snd_win = new Audio("sounds/drum_roll_stopCheers.mp3"); //抽獎中的音效0
+        try {
+          snd_win.currentTime = 0;
+          snd_win.play();
+        }
+        catch(err) {};
+      }
+
+      //畫面的切換
+      if(!startFlag){
+        lotto();
+        startFlag = true;
+      }
+      else{
+        clearTimeout(T);  //讓lotto()裡面的計數器停止
+        startFlag = false;
+
+        var text = "020518";
+        var winnerName = "王眾慧";
+        var priceName = "PS4";
+
+        updateWinnderOnCanvas(scale, text, winnerName, priceName);
+
+      }
+
+    }
+
+
+
+    //給抽獎陣列跟中獎人姓名，即可更新最後中獎畫面的方法
+    function updateWinnderOnCanvas(scale, text, winnerName, priceName){
+      canvas = document.querySelector('canvas');
+
+      if (canvas.getContext) {
+        //畫藍色底線
+        var ctx = canvas.getContext("2d");
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#488';
+        ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+        //畫白色的三種文字元素
+        ctx.font = scale + 'px Helvetica';
+        ctx.fillStyle = '#ccc';
+        ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+        ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-10);
+        ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale+10);
+      }
+
+      var path = window.location.pathname;
+      var page = path.split("/").pop();
+      if(page == "FortuneSlot.html"){
+        scrollIntoView(winnerName); //自動滾動至對應文字的欄位
+        document.getElementById("executeDrawing").setAttribute('src','button1.png');
+      }
+    }
 
 
 
@@ -191,47 +296,7 @@
           <div class="row" style="background-image: linear-gradient(to right, #2A0549 , #E5002D);border-radius: 25px;">
             <div class="col-8">
 
-              <canvas style="margin-top:3%;margin-left:3%"></canvas>
-              <br><br>
-              <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-                <!-- <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p> -->
-
-
-
-                <br><br><br><br><br><br><br><br>
-
-                <!-- Container where we'll display the user details -->
-                <div class="quickstart-user-details-container scrollit">
-                  <span id="connection-status" style="visibility: hidden">Unknown</span>
-                  <br>
-                  <!-- <pre><code> -->
-                  <div id="innerLeft" style="display: none">
-                    <table id="nameTable" style="display: inline">
-                      <tr>
-                        <th>工號:</th>
-                        <th>姓名:</th>
-                        <th>中獎:</th>
-                      </tr>
-                    </table>
-                  </div>
-                    <!-- <div class="scrollit"> -->
-                  <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
-                    <table id="priceTable" style="display: inline;">
-                      <tr>
-                        <th style="width: 100px" class="text-center">序號:</th>
-                        <th style="width: 250px" class="text-center">獎項:</th>
-                        <th style="width: 100px" class="text-center">中獎工號:</th>
-                        <th style="width: 150px" class="text-center">中獎人:</th>
-                        <th></th>
-                      </tr>
-                    </table>
-                  </div>
-                    <!-- </div> -->
-                  <!-- </code></pre> -->
-                </div>
-
-              </div>
-
+              <canvas id="animeCanvas" style="margin-top:3%;margin-left:3%"></canvas>
 
             </div>
 
@@ -239,27 +304,19 @@
 
               <div id="resultArea" >
 
-                <div class="row">
-                  <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
-                    <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
-                  <table id="winnerTable" style="padding-right: 25px;display: inline;">
-                    <tr>
-                      <th style="width: 140px" class="text-center">獎項:</th>
-                      <th>工號:</th>
-                      <th>姓名:</th>
-                      <th></th>
-                    </tr>
-                  </table>
-                  </div>
-                </div>
 
                 <div class="row">
+
+
+
+
                   <audio id="audio">
                     <source src="sounds/drum_roll.mp3" type="audio/mpeg">
                   Your browser does not support this audio format.
                   </audio>
+
                   <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
-                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawByScreenEffect();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
+                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');toggleSound();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
                   <br>
                 </div>
 

@@ -367,11 +367,14 @@
     var indexInUser = null, indexInPriceList = null;
 
     //找到users位置，並更新資料
-    firebase.database().ref("users").orderByChild("員工編號").equalTo(userID).on("value", function(snapshot) {
+    //firebase.database().ref("users").orderByChild("員工編號").equalTo(userID).on("value", function(snapshot) {  //←這種寫法效能慢
+    firebase.database().ref("users").on("value", function(snapshot) {
 
       snapshot.forEach(function(data) {
-            console.log(data.key);
-            indexInUser = data.key;
+        if(data.val()["員工編號"]==userID){
+          console.log(data.key);
+          indexInUser = data.key;
+        }
       });
       firebase.database().ref("users/"+indexInUser).update(
         updateParam ={
