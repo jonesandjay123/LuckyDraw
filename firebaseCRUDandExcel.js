@@ -34,11 +34,13 @@
 
          var userID = (result.val()["WINNERid"] == false) ? "": result.val()["WINNERid"];
          var userName = (result.val()["WINNERname"] == false) ? "": result.val()["WINNERname"];
+         var userDept = (result.val()["WINNERDept"] == false) ? "": result.val()["WINNERDept"];
 
           var obj = {
             "獎項": result.val()["獎項"],
             "工號": userID,
-            "姓名": userName
+            "姓名": userName,
+            "部門": userDept
           };
           data.push(obj);  //把obj塞入陣列
       });
@@ -103,6 +105,7 @@
       for(var i in obj){
         obj[i].WINNERid = false;
         obj[i].WINNERname = false;
+        obj[i].WINNERDept = false;
       }
 
       //把物件寫入資料庫
@@ -195,7 +198,8 @@
         "獎項": empName,
         "編號": empNO,
         WINNERid: false,
-        WINNERname: false
+        WINNERname: false,
+        WINNERDept: false
       };
 
     }
@@ -397,7 +401,8 @@
       firebase.database().ref("priceList/"+indexInPriceList).update(
         updateParam ={
           "WINNERid": false,
-          "WINNERname": false
+          "WINNERname": false,
+          "WINNERDept": false
         },function(error){
         if(error){
           alert("中獎資料更新失敗!");

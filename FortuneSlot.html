@@ -72,7 +72,7 @@
       margin-right:2%;
       float:left;
   }
-  #innerRight {
+  #resultBox {
       max-height:90%;
       overflow-y:auto;
       /* border: 2px solid blue; */
@@ -80,7 +80,7 @@
       margin-left:2%;
       float:left;
   }
-  #resultBox {
+  #innerRight {
       max-height:450px;
       overflow-y:auto;
       /* border: 2px solid blue; */
@@ -147,7 +147,6 @@
 
       $('#speedSlider').on('input', function () {
           var speed = $('#speedSlider').val();
-          console.log("====speed: "+speed);
           $('#speedSpan').text(speed);
       });
 
@@ -224,7 +223,19 @@
                     </table>
                   </div>
                     <!-- <div class="scrollit"> -->
-                  <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
+                    <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
+                      <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
+                    <table id="winnerTable" style="padding-right: 25px;display: inline;">
+                      <tr>
+                        <th style="width: 200px" class="text-center">獎項:</th>
+                        <th style="width: 100px">工號:</th>
+                        <th style="width: 100px">姓名:</th>
+                        <th style="width: 100px">部門</th>
+                        <th></th>
+                      </tr>
+                    </table>
+                    </div>
+                  <!-- <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
                     <table id="priceTable" style="display: inline;">
                       <tr>
                         <th style="width: 100px" class="text-center">序號:</th>
@@ -234,7 +245,7 @@
                         <th></th>
                       </tr>
                     </table>
-                  </div>
+                  </div> -->
                     <!-- </div> -->
                   <!-- </code></pre> -->
                 </div>
@@ -257,7 +268,7 @@
                   </audio>
                   <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
                   <div class="row">
-                    <input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" style="margin-left: 50px"  />
+                    <strong style="margin-left: 50px">快</strong><input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" /><strong>慢</strong>
                     <font color="white">滾動速度: </font><font id="speedSpan" color="white"></font><font color="white">(毫秒)</font>
                   </div>
 
@@ -265,7 +276,19 @@
                 </div>
 
                 <div class="row">
-                  <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
+                  <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
+                    <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">獎項一覽:</h5>
+                    <table id="priceTable" style="display: inline;">
+                      <tr>
+                        <th style="width: 100px" class="text-center">序號:</th>
+                        <th style="width: 250px" class="text-center">獎項:</th>
+                        <!-- <th style="width: 100px" class="text-center">中獎工號:</th>
+                        <th style="width: 150px" class="text-center">中獎人:</th> -->
+                        <th></th>
+                      </tr>
+                    </table>
+                  </div>
+                  <!-- <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
                     <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
                   <table id="winnerTable" style="padding-right: 25px;display: inline;">
                     <tr>
@@ -275,7 +298,7 @@
                       <th></th>
                     </tr>
                   </table>
-                  </div>
+                  </div> -->
                 </div>
 
 

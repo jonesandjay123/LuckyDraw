@@ -1,11 +1,12 @@
 
   var startFlag = false;
-  //宣告6個全域變數儲存本局的六項重要資訊
+  //宣告7個全域變數儲存本局的七項重要資訊
   var thisRoundPriceID;
   var thisRoundPriceName;
   var thisRoundPriceIndex;
   var thisRoundWinnerID;
   var thisRoundWinnerName;
+  var thisRoundWinnerDept;
   var thisRoundWinnerIndex;
   var attendeeIDList = []; //可能中獎的工號清單(新版抽籤方法需要用到)
   var userDetailMap; //把整個在SHOWUP==true條件下找出來的所有user清單暫存在記憶體中，以排除重新回頭找資料的效能問題!
@@ -32,7 +33,6 @@
     }
 
     var attendenceCount = 0, winnerCount = 0; //計算出席資訊
-    var indexList = []; //抽籤用的array
     attendeeIDList = []; //重新執行後就要洗掉全域中的內容
 
     //所有showup為true的人員清單
@@ -50,7 +50,6 @@
             }
             //還沒中過獎的人加入清單
             else{
-              indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
               attendeeIDList.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
             }
       });
@@ -93,6 +92,33 @@
       drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
       thisRoundPriceIndex = drawnItemIndex; //結果傳給全域
 
+      //排外機制
+      if(drawnItemIndex < 3){
+
+        var tempArray = []; //暫存用的array
+        var notSpecial = 0;
+
+        query.on('value', snap => {
+          snap.forEach(function(data) {
+
+            if(data.val()["WON"] == true){}
+            //還沒中過獎的人加入清單
+            else{
+              if(!data.val().isSpecial){
+                notSpecial++;
+              }
+              else {
+                tempArray.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
+              }
+            }
+          });
+        });
+        //利用tempArray的長度和獎項剩餘數來做比較，以判斷是否啟用
+        if(tempArray.length > drawnItemIndex){
+          attendeeIDList = tempArray;
+        }
+      }
+
       //透過drawnItemIndex找出對應的獎項資訊
       var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
       priceInfo.on('value', snap => {
@@ -126,7 +152,8 @@
       firebase.database().ref("priceList/"+thisRoundPriceIndex).update(
         updateParam ={
           "WINNERid": thisRoundWinnerID,
-          "WINNERname": thisRoundWinnerName
+          "WINNERname": thisRoundWinnerName,
+          "WINNERDept": thisRoundWinnerDept
         },function(error){
         if(error){
           alert("中獎資料更新失敗!");
@@ -159,8 +186,8 @@
       snap.forEach(function(data) {
           if(data.val()["員工編號"]==thisRoundWinnerID)
           {
-            console.log("===下面的"+thisRoundWinnerID+"在資料庫中位置: "+data.key+ " 姓名: "+data.val()["姓名"]);
             thisRoundWinnerName = data.val()["姓名"];
+            thisRoundWinnerDept = data.val()["部門"];
             thisRoundWinnerIndex = data.key;
           }
       });
@@ -407,27 +434,36 @@
 
   //自動滾動至對應文字的欄位
   function scrollIntoView(text) {
+
     var tableRow = $("td").filter(function() {
         return $(this).text() == text;
     }).closest("tr").css('color','black').css('font-weight','bold').css('background-color', 'orange');
 
+    var tbHight =$('#innerRight').height();//DIV的高度
+    var totalRows = $('#priceTable tr').length; //整個table的row數(基本上獎項幾個就有幾個tr)
+    var avgBlockHeight = Math.round(tbHight / totalRows);
+
+    //如果找不到下一個禮物的index值(通常是刷新以後發生)，就不用再繼續做scrollTop的判定校正
+    if(thisRoundPriceIndex === undefined){
+      return;
+    }
+
     //因為畫面最後會取回3個tableRow，而我們只要1、2號結果的position來跳轉位置。
     var count = 0;
-    var position = 0;
     tableRow.each( function() {
+
+      // if(count == 1){
+      //   //左邊的已經被隱藏，暫時不用。
+      //   var $currentJqueryElement = $(this);
+      //   position = $currentJqueryElement.position().top;
+      //   document.getElementById('innerLeft').scrollTop = position -100;
+      // }
       if(count == 1){
-        var $currentJqueryElement = $(this);
-        position = $currentJqueryElement.position().top;
-        document.getElementById('innerLeft').scrollTop = position -100;
-      }
-      if(count == 2){
-        var $currentJqueryElement = $(this);
-        position = $currentJqueryElement.position().top;
-        document.getElementById('innerRight').scrollTop = position +50;
+        console.log("scroll to: "+tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight));
+        document.getElementById('innerRight').scrollTop =  tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight);
       }
       count++;
     });
-    //document.getElementById('innerLeft').scrollTop = tableRow.position().top + 25;
   }
 
   //繪製人員清單的table
@@ -550,6 +586,13 @@
             td3W.appendChild(txt3W);
             trW.appendChild(td3W);
 
+            //第3b個TD
+            var td3bW = document.createElement("td");
+            var txt3bW = document.createTextNode(parsedData[i].WINNERDept);  //用winLabel來切換是否顯示打勾
+            td3bW.setAttribute("style", "font-family:Microsoft JhengHei;font-weight:bold");
+            td3bW.appendChild(txt3bW);
+            trW.appendChild(td3bW);
+
             //第四個TD
             var td4W = document.createElement("td");
             var btn = document.createElement('BUTTON');
@@ -580,18 +623,18 @@
           td2.classList.add("text-center");
           td2.appendChild(txt2);
           tr.appendChild(td2);
-          //第三個TD
-          var td3 = document.createElement("td");
-          var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示id
-          td3.classList.add("text-center");
-          td3.appendChild(txt3);
-          tr.appendChild(td3);
-          //第四個TD
-          var td4 = document.createElement("td");
-          var txt4 = document.createTextNode(winLabel2);  //用winLabel2來切換是否顯示name
-          td4.classList.add("text-center");
-          td4.appendChild(txt4);
-          tr.appendChild(td4);
+          // //第三個TD
+          // var td3 = document.createElement("td");
+          // var txt3 = document.createTextNode(winLabel);  //用winLabel來切換是否顯示id
+          // td3.classList.add("text-center");
+          // td3.appendChild(txt3);
+          // tr.appendChild(td3);
+          // //第四個TD
+          // var td4 = document.createElement("td");
+          // var txt4 = document.createTextNode(winLabel2);  //用winLabel2來切換是否顯示name
+          // td4.classList.add("text-center");
+          // td4.appendChild(txt4);
+          // tr.appendChild(td4);
 
           //第五個TD
           var td5 = document.createElement("td");
@@ -836,10 +879,11 @@
    ctx.setTransform(1,0,0,1,0,0);
 
    ctx.fillStyle = '#FFA500';
+   ctx.font = scale + 'px Helvetica';
    ctx.fillRect(0,(canvas.height-scale)/2 +scale,canvas.width,scale);
 
    ctx.fillStyle = '#ccc';
-   ctx.font = scale + 'px Helvetica';
+   ctx.font = scale + 'px Microsoft JhengHei';
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
    ctx.fillStyle = '#ED1C1C';
