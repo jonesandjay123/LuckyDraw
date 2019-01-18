@@ -142,6 +142,15 @@
 
   <script type="text/javascript">
     window.onload = function() {
+      //初始化速度
+      $('#speedSpan').text($('#speedSlider').val());
+
+      $('#speedSlider').on('input', function () {
+          var speed = $('#speedSlider').val();
+          console.log("====speed: "+speed);
+          $('#speedSpan').text(speed);
+      });
+
       initApp();
       getListFromDB();
       displayWindowSize(); //寬度偵測
@@ -240,6 +249,22 @@
               <div id="resultArea" >
 
                 <div class="row">
+                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawByScreenEffect();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
+
+                  <audio id="audio">
+                    <source src="sounds/drum_roll.mp3" type="audio/mpeg">
+                  Your browser does not support this audio format.
+                  </audio>
+                  <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
+                  <div class="row">
+                    <input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" style="margin-left: 50px"  />
+                    <font color="white">滾動速度: </font><font id="speedSpan" color="white"></font><font color="white">(毫秒)</font>
+                  </div>
+
+                  <br>
+                </div>
+
+                <div class="row">
                   <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
                     <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
                   <table id="winnerTable" style="padding-right: 25px;display: inline;">
@@ -253,15 +278,7 @@
                   </div>
                 </div>
 
-                <div class="row">
-                  <audio id="audio">
-                    <source src="sounds/drum_roll.mp3" type="audio/mpeg">
-                  Your browser does not support this audio format.
-                  </audio>
-                  <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
-                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawByScreenEffect();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
-                  <br>
-                </div>
+
 
               </div>
 

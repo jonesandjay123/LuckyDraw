@@ -1,7 +1,14 @@
 
   var startFlag = false;
-  var thisRoundWinnerID; //宣告一個變數儲存本局中獎者的ID
+  //宣告6個全域變數儲存本局的六項重要資訊
+  var thisRoundPriceID;
+  var thisRoundPriceName;
+  var thisRoundPriceIndex;
+  var thisRoundWinnerID;
+  var thisRoundWinnerName;
+  var thisRoundWinnerIndex;
   var attendeeIDList = []; //可能中獎的工號清單(新版抽籤方法需要用到)
+  var userDetailMap; //把整個在SHOWUP==true條件下找出來的所有user清單暫存在記憶體中，以排除重新回頭找資料的效能問題!
   var scale = 80;  // Font size and overall scale(canvas上要用到的字體大小)
 
   //新版抽獎動作(對外版改走這種抽獎模式)
@@ -31,6 +38,8 @@
     //所有showup為true的人員清單
     var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
 
+    userDetailMap = query; //把結果偷偷存給全域變數userDetailMap(之後的姓名，及index可以透過它來取得!)
+
     query.on('value', snap => {
 
       attendenceCount = Object.size(snap.val()); //query結果的總數
@@ -55,7 +64,7 @@
     }
 
     //取得接下來要抽的獎項的id
-    //var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
+    var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
 
     //===音效的部分==========
     var audioElem = document.getElementById('audio');
@@ -78,6 +87,19 @@
 
     //若是停止狀態的話
     if(!startFlag){
+
+      //先準備好獎項有關的資訊
+      var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
+      drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
+      thisRoundPriceIndex = drawnItemIndex; //結果傳給全域
+
+      //透過drawnItemIndex找出對應的獎項資訊
+      var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
+      priceInfo.on('value', snap => {
+        thisRoundPriceID = snap.val()["編號"];
+        thisRoundPriceName = snap.val()["獎項"];
+      });
+
       //參考http://www.dynamicdrive.com/dynamicindex12/lottery.htm
       lotto();
       startFlag = true; //狀態設為運轉中
@@ -88,94 +110,38 @@
       clearTimeout(T);  //讓上面if裡面滾動中的計數器參數T停止
       startFlag = false; //狀態設為停止
 
-      //動畫押上籃底姓名獎項等資訊
-      canvas = document.querySelector('canvas');
-      if (canvas.getContext) {
-        //畫藍色底線
-        var ctx = canvas.getContext("2d");
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#488';
-        ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
-        //畫白色的三種文字元素
-        ctx.font = scale + 'px Helvetica';
-        ctx.fillStyle = '#ccc';
-        ctx.fillText(thisRoundWinnerID,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
-        //姓名跟獎項名稱想用Microsoft JhengHei
-        ctx.font = scale + 'px Microsoft JhengHei';
-      }
-
-      var drawnIndex = null;
-      var winnerName = null;
-
-      var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
-      drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
-
-      //透過drawnItemIndex找出對應的獎項資訊
-      var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
-      var priceID = null;
-      var priceName = null;
-
-      priceInfo.on('value', snap => {
-        priceID = snap.val()["編號"];
-        priceName = snap.val()["獎項"];
-        ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale); //等讀取完再畫canvas即使延遲至少會顯示
-      });
-
-      //透過thisRoundWinnerID找到位置，進而找出名子
-      firebase.database().ref("users").on("value", function(snapshot) {
-        snapshot.forEach(function(data) {
-            if(data.val()["員工編號"]==thisRoundWinnerID)
-            {
-              console.log(thisRoundWinnerID+"在資料庫中位置: "+data.key+ " 姓名: "+data.val()["姓名"]);
-              drawnIndex = data.key;
-              winnerName = data.val()["姓名"];
-              ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-5);  //等讀取完再畫canvas即使延遲至少會顯示
-            }
-        });
-      });
-
-      //參考這篇: https://firebase.google.com/docs/database/web/read-and-write
-      /*
-      firebase.database().ref("priceList/"+drawnItemIndex).update(
-        updateParam ={
-          "WINNERid": thisRoundWinnerID,
-          "WINNERname": winnerName
-        },function(error){
-        if(error){
-          alert("中獎資料更新失敗!");
-          console.log("中獎資料更新失敗!" + error);
-        }
-      });
-
       //把結果更新回資料庫
-      firebase.database().ref("users/"+drawnIndex).update(
+      firebase.database().ref("users/"+thisRoundWinnerIndex).update(
         updateParam ={
           "WON": true,
-          "PID": priceID,
-          "PRICE": priceName
+          "PID": thisRoundPriceID,
+          "PRICE": thisRoundPriceName
         },function(error){
         if(error){
           alert("中獎資料更新失敗!");
           console.log("中獎資料更新失敗!" + error);
         }
       });
-      */
 
-
-
+      firebase.database().ref("priceList/"+thisRoundPriceIndex).update(
+        updateParam ={
+          "WINNERid": thisRoundWinnerID,
+          "WINNERname": thisRoundWinnerName
+        },function(error){
+        if(error){
+          alert("中獎資料更新失敗!");
+          console.log("中獎資料更新失敗!" + error);
+        }
+      });
 
       var path = window.location.pathname;
       var page = path.split("/").pop();
       if(page == "FortuneSlot.html"){
-        scrollIntoView(winnerName); //自動滾動至對應文字的欄位
+        scrollIntoView(thisRoundWinnerName); //自動滾動至對應文字的欄位
         document.getElementById("executeDrawing").setAttribute('src','button1.png');
       }
 
     }
-
-
-
 
   }
 
@@ -188,6 +154,18 @@
     thisRoundWinnerID = attendeeIDList[0]; //把洗亂後結果的第一筆，當作抽中的人。
     OutPut = attendeeIDList[0];  //也把結果即時顯示在畫面上。
 
+    //透過thisRoundWinnerID去早就存好在記憶體清單中的明細，找出位置(回寫用)，以及名子。
+    userDetailMap.on('value', snap => {
+      snap.forEach(function(data) {
+          if(data.val()["員工編號"]==thisRoundWinnerID)
+          {
+            console.log("===下面的"+thisRoundWinnerID+"在資料庫中位置: "+data.key+ " 姓名: "+data.val()["姓名"]);
+            thisRoundWinnerName = data.val()["姓名"];
+            thisRoundWinnerIndex = data.key;
+          }
+      });
+    });
+
     //將滾動的結果顯示在畫布上
     canvas = document.querySelector('canvas');
     if (canvas.getContext) {
@@ -199,13 +177,23 @@
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
       ctx.globalAlpha = 1;
+
+      ctx.fillStyle = '#488';
+      ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+
       ctx.fillStyle = '#ccc';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
       ctx.font = scale + 'px Helvetica';
       ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+
+      //姓名跟獎項名稱想用Microsoft JhengHei
+      ctx.font = scale + 'px Microsoft JhengHei';
+      ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-5);  //等讀取完再畫canvas即使延遲至少會顯示
+      ctx.fillText(thisRoundPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale+5);
     }
-    T=setTimeout('lotto()',20);  //畫面滾動的速度
+    var speed = $('#speedSlider').val();
+    T=setTimeout('lotto()',speed);  //畫面滾動的速度
   }
 
 
@@ -846,9 +834,15 @@
    //重新繪製canvas
    ctx.globalAlpha = 1;
    ctx.setTransform(1,0,0,1,0,0);
+
+   ctx.fillStyle = '#FFA500';
+   ctx.fillRect(0,(canvas.height-scale)/2 +scale,canvas.width,scale);
+
+   ctx.fillStyle = '#ccc';
    ctx.font = scale + 'px Helvetica';
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
+   ctx.fillStyle = '#ED1C1C';
    ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale);
    var path = window.location.pathname;
    var page = path.split("/").pop();
