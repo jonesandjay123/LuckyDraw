@@ -356,7 +356,7 @@
   //讓出-讓抽中的結果回復!
   function rollbackResult(btn){
 
-    localStorage.setItem("latestAction","rollbackResult");
+    localStorage.setItem("latestAction","rollbackResult"); //讓出的動作執行時，在localStorage中留下一個標記，讓系統知道不要重繪canvas
 
     var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
     var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;

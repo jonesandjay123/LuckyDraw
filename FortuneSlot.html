@@ -185,136 +185,131 @@
     </div>
   </header>
 
-  <main class="mdl-layout__content mdl-color--grey-100" id="pageMain">
-    <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+  <div class="container-fluid" style="margin-top: 2%; padding-left:4%; padding-right:4%">
 
-      <!-- Container for the demo -->
-      <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-        <!-- <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
-          <h2 class="mdl-card__title-text">開獎頁面</h2>
-        </div> -->
+    <div class="row" style="background-image: linear-gradient(to right, #2A0549 , #E5002D);border-radius: 25px;">
+      <div class="col-8">
 
-        <div class="container" style="margin-top: 6%" >
-
-          <div class="row" style="background-image: linear-gradient(to right, #2A0549 , #E5002D);border-radius: 25px;">
-            <div class="col-8">
-
-              <canvas style="margin-top:3%;margin-left:3%"></canvas>
-              <br><br>
-              <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-                <!-- <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p> -->
+        <canvas style="margin-top:3%;margin-left:3%"></canvas>
+        <br><br>
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+          <!-- <p id="updateNote">匯入的excel檔，人員清單活頁簿名稱必須要叫做:工作表</p> -->
 
 
 
-                <br><br><br><br><br><br><br><br>
+          <br><br><br><br><br><br><br><br>
 
-                <!-- Container where we'll display the user details -->
-                <div class="quickstart-user-details-container scrollit">
-                  <span id="connection-status" style="visibility: hidden">Unknown</span>
-                  <br>
-                  <!-- <pre><code> -->
-                  <div id="innerLeft" style="display: none">
-                    <table id="nameTable" style="display: inline">
-                      <tr>
-                        <th>工號:</th>
-                        <th>姓名:</th>
-                        <th>中獎:</th>
-                      </tr>
-                    </table>
-                  </div>
-                    <!-- <div class="scrollit"> -->
-                    <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
-                      <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
-                    <table id="winnerTable" style="padding-right: 25px;display: inline;">
-                      <tr>
-                        <th style="width: 200px" class="text-center">獎項:</th>
-                        <th style="width: 100px">工號:</th>
-                        <th style="width: 100px">姓名:</th>
-                        <th style="width: 100px">部門</th>
-                        <th></th>
-                      </tr>
-                    </table>
-                    </div>
-                  <!-- <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
-                    <table id="priceTable" style="display: inline;">
-                      <tr>
-                        <th style="width: 100px" class="text-center">序號:</th>
-                        <th style="width: 250px" class="text-center">獎項:</th>
-                        <th style="width: 100px" class="text-center">中獎工號:</th>
-                        <th style="width: 150px" class="text-center">中獎人:</th>
-                        <th></th>
-                      </tr>
-                    </table>
-                  </div> -->
-                    <!-- </div> -->
-                  <!-- </code></pre> -->
-                </div>
-
-              </div>
-
-
+          <!-- Container where we'll display the user details -->
+          <div class="quickstart-user-details-container scrollit">
+            <span id="connection-status" style="visibility: hidden">Unknown</span>
+            <br>
+            <!-- <pre><code> -->
+            <div id="innerLeft" style="display: none">
+              <table id="nameTable" style="display: inline">
+                <tr>
+                  <th>工號:</th>
+                  <th>姓名:</th>
+                  <th>中獎:</th>
+                </tr>
+              </table>
             </div>
-
-            <div class="col-4">
-
-              <div id="resultArea" >
-
-                <div class="row">
-                  <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawByScreenEffect();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
-
-                  <audio id="audio">
-                    <source src="sounds/drum_roll.mp3" type="audio/mpeg">
-                  Your browser does not support this audio format.
-                  </audio>
-                  <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
-                  <div class="row">
-                    <strong style="margin-left: 50px">快</strong><input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" /><strong>慢</strong>
-                    <font color="white">滾動速度: </font><font id="speedSpan" color="white"></font><font color="white">(毫秒)</font>
-                  </div>
-
-                  <br>
-                </div>
-
-                <div class="row">
-                  <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
-                    <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">獎項一覽:</h5>
-                    <table id="priceTable" style="display: inline;">
-                      <tr>
-                        <th style="width: 100px" class="text-center">序號:</th>
-                        <th style="width: 250px" class="text-center">獎項:</th>
-                        <!-- <th style="width: 100px" class="text-center">中獎工號:</th>
-                        <th style="width: 150px" class="text-center">中獎人:</th> -->
-                        <th></th>
-                      </tr>
-                    </table>
-                  </div>
-                  <!-- <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
-                    <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
-                  <table id="winnerTable" style="padding-right: 25px;display: inline;">
-                    <tr>
-                      <th style="width: 140px" class="text-center">獎項:</th>
-                      <th>工號:</th>
-                      <th>姓名:</th>
-                      <th></th>
-                    </tr>
-                  </table>
-                  </div> -->
-                </div>
-
-
-
+              <!-- <div class="scrollit"> -->
+              <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
+                <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
+              <table id="winnerTable" style="padding-right: 25px;display: inline;">
+                <tr>
+                  <th style="width: 200px" class="text-center">獎項:</th>
+                  <th style="width: 100px">工號:</th>
+                  <th style="width: 100px">姓名:</th>
+                  <th style="width: 100px">部門</th>
+                  <th></th>
+                </tr>
+              </table>
               </div>
-
-            </div>
+            <!-- <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
+              <table id="priceTable" style="display: inline;">
+                <tr>
+                  <th style="width: 100px" class="text-center">序號:</th>
+                  <th style="width: 250px" class="text-center">獎項:</th>
+                  <th style="width: 100px" class="text-center">中獎工號:</th>
+                  <th style="width: 150px" class="text-center">中獎人:</th>
+                  <th></th>
+                </tr>
+              </table>
+            </div> -->
+              <!-- </div> -->
+            <!-- </code></pre> -->
           </div>
-        </div>
 
+        </div>
 
 
       </div>
 
+      <div class="col-4">
+
+        <div id="resultArea" >
+
+          <div class="row">
+            <input id="executeDrawing" type="image" src="button1.png" onclick="this.setAttribute('src','button3.png');drawByScreenEffect();" onmouseover="this.setAttribute('src','button2.png');" onmouseout="this.setAttribute('src','button1.png');" style="margin-left: 15%; margin-top: 5%; width: 50%; height: 50%" />
+
+            <audio id="audio">
+              <source src="sounds/drum_roll.mp3" type="audio/mpeg">
+            Your browser does not support this audio format.
+            </audio>
+            <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
+            <div class="row">
+              <strong style="margin-left: 50px">快</strong><input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" /><strong>慢</strong>
+              <font color="white">滾動速度: </font><font id="speedSpan" color="white"></font><font color="white">(毫秒)</font>
+            </div>
+
+            <br>
+          </div>
+
+          <div class="row">
+            <div id="innerRight" style="display: inline; background-image: linear-gradient(to right, #2A0549 , #E5002D); width: 100%; border-radius: 25px; padding:20px 20px 20px 20px" class="border border-light">
+              <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">獎項一覽:</h5>
+              <table id="priceTable" style="display: inline;">
+                <tr>
+                  <th style="width: 100px" class="text-center">序號:</th>
+                  <th style="width: 250px" class="text-center">獎項:</th>
+                  <!-- <th style="width: 100px" class="text-center">中獎工號:</th>
+                  <th style="width: 150px" class="text-center">中獎人:</th> -->
+                  <th></th>
+                </tr>
+              </table>
+            </div>
+            <!-- <div id="resultBox" style="display: inline; width: 100%;background-color: #ff6699;border-radius: 25px; margin-top: 6%; margin-right: 6%">
+              <h5 align="center" style="color:yellow ;font-family:微軟正黑體;">中獎清單</h5>
+            <table id="winnerTable" style="padding-right: 25px;display: inline;">
+              <tr>
+                <th style="width: 140px" class="text-center">獎項:</th>
+                <th>工號:</th>
+                <th>姓名:</th>
+                <th></th>
+              </tr>
+            </table>
+            </div> -->
+          </div>
+
+
+
+        </div>
+
+      </div>
     </div>
-  </main>
+  </div>
+
+  <!-- <main class="mdl-layout__content mdl-color--grey-100" id="pageMain">
+    <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+
+      <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+
+      </div>
+
+    </div>
+  </main> -->
+
 </div>
 </body>
 </html>

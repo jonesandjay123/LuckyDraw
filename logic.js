@@ -595,7 +595,7 @@
             //第3b個TD
             var td3bW = document.createElement("td");
             var txt3bW = document.createTextNode(parsedData[i].WINNERDept);  //用winLabel來切換是否顯示打勾
-            td3bW.setAttribute("style", "font-family:Microsoft JhengHei;font-weight:bold");
+            td3bW.setAttribute("style", "font-family:Microsoft JhengHei;font-weight:bold; ");
             td3bW.appendChild(txt3bW);
             trW.appendChild(td3bW);
 
@@ -611,6 +611,7 @@
 
             td4W.appendChild(btn);
             trW.appendChild(td4W);
+            //trW.setAttribute("style", "line-height: 50px; ");
 
             //加進tbody跟table
             tbodyW.appendChild(trW);
@@ -886,7 +887,6 @@
      return;
    }
 
-
    if(localStorage.getItem("latestWinnerID")==null || localStorage.getItem("latestWinnerName")==null || localStorage.getItem("latestPriceName")==null){
      console.log("localStorage中有關上一輪中獎者的資訊有缺! 故使用原本傳進來的參數(可能會有失準的問題~)");
    }
@@ -896,8 +896,6 @@
      priceName = localStorage.getItem("latestPriceName");
      console.log("剛剛的中獎人是: "+localStorage.getItem("latestWinnerID") +" "+localStorage.getItem("latestWinnerName") + " 獎品: "+localStorage.getItem("latestPriceName"));
    }
-
-
 
    //重新繪製canvas
    ctx.globalAlpha = 1;
