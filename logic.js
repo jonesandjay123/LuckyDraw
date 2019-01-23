@@ -136,6 +136,12 @@
       clearTimeout(T);  //讓上面if裡面滾動中的計數器參數T停止
       startFlag = false; //狀態設為停止
 
+      //把三個顯示用的字串傳進localStorage
+      localStorage.setItem("latestWinnerID",thisRoundWinnerID);
+      localStorage.setItem("latestWinnerName",thisRoundWinnerName);
+      localStorage.setItem("latestPriceName",thisRoundPriceName);
+      localStorage.setItem("latestAction","drawByScreenEffect"); //抽獎完畢後，在localStorage中留更新latestAction，蓋掉可能是rollbackResult的名稱
+
       //把結果更新回資料庫
       firebase.database().ref("users/"+thisRoundWinnerIndex).update(
         updateParam ={
@@ -459,7 +465,7 @@
       //   document.getElementById('innerLeft').scrollTop = position -100;
       // }
       if(count == 1){
-        console.log("scroll to: "+tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight));
+        //console.log("scroll to: "+tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight));
         document.getElementById('innerRight').scrollTop =  tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight);
       }
       count++;
@@ -874,6 +880,25 @@
 
  //給抽獎陣列跟中獎人姓名，即可更新最後中獎畫面的方法
  function updateWinnderOnCanvas(scale, text, winnerName, priceName){
+
+   if (localStorage.getItem("latestAction") == "rollbackResult") {
+     console.log("刷新前執行了讓出，故不需要更新黑屏幕!!");
+     return;
+   }
+
+
+   if(localStorage.getItem("latestWinnerID")==null || localStorage.getItem("latestWinnerName")==null || localStorage.getItem("latestPriceName")==null){
+     console.log("localStorage中有關上一輪中獎者的資訊有缺! 故使用原本傳進來的參數(可能會有失準的問題~)");
+   }
+   else{
+     text = localStorage.getItem("latestWinnerID");
+     winnerName = localStorage.getItem("latestWinnerName");
+     priceName = localStorage.getItem("latestPriceName");
+     console.log("剛剛的中獎人是: "+localStorage.getItem("latestWinnerID") +" "+localStorage.getItem("latestWinnerName") + " 獎品: "+localStorage.getItem("latestPriceName"));
+   }
+
+
+
    //重新繪製canvas
    ctx.globalAlpha = 1;
    ctx.setTransform(1,0,0,1,0,0);

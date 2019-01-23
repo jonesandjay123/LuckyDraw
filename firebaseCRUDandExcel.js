@@ -356,9 +356,10 @@
   //讓出-讓抽中的結果回復!
   function rollbackResult(btn){
 
+    localStorage.setItem("latestAction","rollbackResult");
+
     var winnerName = btn.parentElement.parentElement.firstChild.innerHTML;
     var winnerPrice = btn.parentElement.parentElement.firstChild.nextSibling.nextSibling.innerHTML;
-
 
     if (!confirm("是否確定要讓出 "+winnerName+" 所獲得的 "+winnerPrice+"? ")){return;}
 
