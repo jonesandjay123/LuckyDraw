@@ -220,6 +220,8 @@
       ctx.font = scale + 'px Helvetica';
       ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
 
+      console.log(thisRoundPriceName+"的字體長度為: "+thisRoundPriceName.length);
+
       //姓名跟獎項名稱想用Microsoft JhengHei
       ctx.font = scale + 'px Microsoft JhengHei';
       ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-5);  //等讀取完再畫canvas即使延遲至少會顯示
