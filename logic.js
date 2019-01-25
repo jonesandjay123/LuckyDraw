@@ -220,19 +220,23 @@
       ctx.font = scale + 'px Helvetica';
       ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
 
-      console.log(thisRoundPriceName+"的字體長度為: "+thisRoundPriceName.length);
-
       //姓名跟獎項名稱想用Microsoft JhengHei
       ctx.font = scale + 'px Microsoft JhengHei';
       ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-5);  //等讀取完再畫canvas即使延遲至少會顯示
-      ctx.fillText(thisRoundPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale+5);
+
+      var tempDisplayPriceName = thisRoundPriceName;
+      //console.log(thisRoundPriceName+"的字體長度為: "+thisRoundPriceName.length);
+      if(thisRoundPriceName.length > 25){
+        tempDisplayPriceName = tempDisplayPriceName.substring(0,25);
+        tempDisplayPriceName = tempDisplayPriceName + "...";
+      }
+      ctx.font = 45 + 'px Microsoft JhengHei';
+
+      ctx.fillText(tempDisplayPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale+5);
     }
     var speed = $('#speedSlider').val();
     T=setTimeout('lotto()',speed);  //畫面滾動的速度
   }
-
-
-
 
   //抽獎動作
   function drawForWinner(){
@@ -579,7 +583,7 @@
             //第一個TD
             var td1W = document.createElement("td");
             var txt1W = document.createTextNode(parsedData[i]["獎項"]);
-            td1W.classList.add("text-center");
+            //td1W.classList.add("text-center"); //置中
             td1W.appendChild(txt1W);
             trW.appendChild(td1W);
             //第二個TD
@@ -629,7 +633,7 @@
           //第二個TD
           var td2 = document.createElement("td");
           var txt2 = document.createTextNode(parsedData[i]["獎項"]);
-          td2.classList.add("text-center");
+          //td2.classList.add("text-center");  //置中
           td2.appendChild(txt2);
           tr.appendChild(td2);
           // //第三個TD
@@ -912,6 +916,9 @@
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
    ctx.fillStyle = '#ED1C1C';
+
+   ctx.font = 50 + 'px Microsoft JhengHei';
+
    ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale);
    var path = window.location.pathname;
    var page = path.split("/").pop();
