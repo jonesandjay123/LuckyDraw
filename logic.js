@@ -10,7 +10,7 @@
   var thisRoundWinnerIndex;
   var attendeeIDList = []; //可能中獎的工號清單(新版抽籤方法需要用到)
   var userDetailMap; //把整個在SHOWUP==true條件下找出來的所有user清單暫存在記憶體中，以排除重新回頭找資料的效能問題!
-  var scale = 80;  // Font size and overall scale(canvas上要用到的字體大小)
+  var scale = 60;  // Font size and overall scale(canvas上要用到的字體大小)
 
   //新版抽獎動作(對外版改走這種抽獎模式)
   function drawByScreenEffect(){
@@ -139,6 +139,7 @@
       //把三個顯示用的字串傳進localStorage
       localStorage.setItem("latestWinnerID",thisRoundWinnerID);
       localStorage.setItem("latestWinnerName",thisRoundWinnerName);
+      localStorage.setItem("latestWinnerDept",thisRoundWinnerDept);
       localStorage.setItem("latestPriceName",thisRoundPriceName);
       localStorage.setItem("latestAction","drawByScreenEffect"); //抽獎完畢後，在localStorage中留更新latestAction，蓋掉可能是rollbackResult的名稱
 
@@ -212,27 +213,24 @@
       ctx.globalAlpha = 1;
 
       ctx.fillStyle = '#488';
-      ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+      //ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+      ctx.fillRect(0,(canvas.height-scale)/2 +(scale/3),canvas.width,scale);
 
       ctx.fillStyle = '#ccc';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
       ctx.font = scale + 'px Helvetica';
-      ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+      //ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+      ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale/3));
 
       //姓名跟獎項名稱想用Microsoft JhengHei
       ctx.font = scale + 'px Microsoft JhengHei';
-      ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale-5);  //等讀取完再畫canvas即使延遲至少會顯示
+      ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/3));  //等讀取完再畫canvas即使延遲至少會顯示
+      ctx.fillText(thisRoundPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale*1.5));
+      ctx.font = (scale/1.5) + 'px Microsoft JhengHei';
+      ctx.fillStyle = '#ED1C1C';
+      ctx.fillText(thisRoundWinnerDept,Math.floor(canvas.width/2),Math.floor(canvas.height/3)-scale);
 
-      var tempDisplayPriceName = thisRoundPriceName;
-      //console.log(thisRoundPriceName+"的字體長度為: "+thisRoundPriceName.length);
-      if(thisRoundPriceName.length > 25){
-        tempDisplayPriceName = tempDisplayPriceName.substring(0,25);
-        tempDisplayPriceName = tempDisplayPriceName + "...";
-      }
-      ctx.font = 45 + 'px Microsoft JhengHei';
-
-      ctx.fillText(tempDisplayPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale+5);
     }
     var speed = $('#speedSlider').val();
     T=setTimeout('lotto()',speed);  //畫面滾動的速度
@@ -583,7 +581,7 @@
             //第一個TD
             var td1W = document.createElement("td");
             var txt1W = document.createTextNode(parsedData[i]["獎項"]);
-            //td1W.classList.add("text-center"); //置中
+            td1W.classList.add("text-center"); //置中
             td1W.appendChild(txt1W);
             trW.appendChild(td1W);
             //第二個TD
@@ -678,7 +676,7 @@
             var lastpriceName = wTable.rows[1].cells[0].innerHTML;
             var lastWinnerID = wTable.rows[1].cells[1].innerHTML;
             var lastWinnerName = wTable.rows[1].cells[2].innerHTML;
-            var scale = 85;
+            var lastWinnerDept = wTable.rows[1].cells[3].innerHTML;
 
             //先清空最上一層的繪製結果
             canvas = document.querySelector('canvas');
@@ -690,7 +688,7 @@
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
 
-            updateWinnderOnCanvas(scale, lastWinnerID, lastWinnerName, lastpriceName);
+            updateWinnderOnCanvas(scale, lastWinnerID, lastWinnerName, lastpriceName, lastWinnerDept);
           }
         }
 
@@ -886,19 +884,20 @@
  }
 
  //給抽獎陣列跟中獎人姓名，即可更新最後中獎畫面的方法
- function updateWinnderOnCanvas(scale, text, winnerName, priceName){
+ function updateWinnderOnCanvas(scale, text, winnerName, priceName, winnerDept){
 
    if (localStorage.getItem("latestAction") == "rollbackResult") {
      console.log("刷新前執行了讓出，故不需要更新黑屏幕!!");
      return;
    }
 
-   if(localStorage.getItem("latestWinnerID")==null || localStorage.getItem("latestWinnerName")==null || localStorage.getItem("latestPriceName")==null){
+   if(localStorage.getItem("latestWinnerID")==null || localStorage.getItem("latestWinnerName")==null || localStorage.getItem("latestPriceName")==null || localStorage.getItem("latestWinnerDept")==null){
      console.log("localStorage中有關上一輪中獎者的資訊有缺! 故使用原本傳進來的參數(可能會有失準的問題~)");
    }
    else{
      text = localStorage.getItem("latestWinnerID");
      winnerName = localStorage.getItem("latestWinnerName");
+     winnerDept =  localStorage.getItem("latestWinnerDept");
      priceName = localStorage.getItem("latestPriceName");
      console.log("剛剛的中獎人是: "+localStorage.getItem("latestWinnerID") +" "+localStorage.getItem("latestWinnerName") + " 獎品: "+localStorage.getItem("latestPriceName"));
    }
@@ -909,17 +908,19 @@
 
    ctx.fillStyle = '#FFA500';
    ctx.font = scale + 'px Helvetica';
-   ctx.fillRect(0,(canvas.height-scale)/2 +scale,canvas.width,scale);
+   ctx.fillRect(0,(canvas.height-scale)/2 +(scale/2) +scale,canvas.width,scale);
 
    ctx.fillStyle = '#ccc';
    ctx.font = scale + 'px Microsoft JhengHei';
-   ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
-   ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)-scale);
+   ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/3));
+   ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale/3));
+
    ctx.fillStyle = '#ED1C1C';
 
-   ctx.font = 50 + 'px Microsoft JhengHei';
+   ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale*1.5));
+   ctx.font = (scale/1.5) + 'px Microsoft JhengHei';
+   ctx.fillText(winnerDept,Math.floor(canvas.width/2),Math.floor(canvas.height/3)-scale);
 
-   ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+scale);
    var path = window.location.pathname;
    var page = path.split("/").pop();
    if(page == "FortuneSlot.html"){
