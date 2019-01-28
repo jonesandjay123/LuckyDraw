@@ -170,6 +170,14 @@
         }
     };
 
+    $(document).keypress(function(e) {
+      if(e.which == 13) {
+        executeDrawing
+        var btn = document.getElementById("executeDrawing");
+        btn.setAttribute('src','button3.png');
+        drawByScreenEffect();
+      }
+    });
 
 
   </script>
