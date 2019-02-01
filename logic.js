@@ -91,9 +91,10 @@
       var drawnItemIndex = selectedCB[0].id.substring(2); //把checkbox id中前兩個cb的字元移除
       drawnItemIndex -= 1; //接著把編號數字-1，轉回DB中的index位置
       thisRoundPriceIndex = drawnItemIndex; //結果傳給全域
-
+      console.log("這回要抽的獎項drawnItemIndex: "+drawnItemIndex);
       //排外機制
-      if(drawnItemIndex < 3){
+      //if(drawnItemIndex < 3){
+      if(drawnItemIndex == 3 || drawnItemIndex == 2){
 
         var tempArray = []; //暫存用的array
         var notSpecial = 0;
@@ -228,7 +229,7 @@
       ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/3));  //等讀取完再畫canvas即使延遲至少會顯示
       ctx.fillText(thisRoundPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale*1.5));
       ctx.font = (scale/1.5) + 'px Microsoft JhengHei';
-      ctx.fillStyle = '#ED1C1C';
+      ctx.fillStyle = '#ffcc00';
       ctx.fillText(thisRoundWinnerDept,Math.floor(canvas.width/2),Math.floor(canvas.height/3)-scale);
 
     }
@@ -260,7 +261,7 @@
     var indexList = []; //抽籤用的array
     var possibleWinnerIDList = []; //可能中獎的工號清單(doAnimation需要用到)
 
-    //var priorityList = ['008832', '015029', '010467','021377','021476','011520'], priorityIndex = []; //開啟本行後，同時開啟44~51，67~84。
+    //var priorityList = [], priorityIndex = [];
 
     //所有showup為true的人員清單
     var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
@@ -571,8 +572,8 @@
           var winLabel2 = "";
           //若獲獎者清單不為false，表示已經被抽中，就把字體、底色改變
           if(parsedData[i].WINNERid != false){
-            tr.style.color = "red";
-            tr.style.backgroundColor = "yellow";
+            tr.style.color = "black";
+            tr.style.backgroundColor = "#ccccb3";
             winLabel = parsedData[i].WINNERid;
             winLabel2 = parsedData[i].WINNERname;
 
@@ -906,7 +907,7 @@
    ctx.globalAlpha = 1;
    ctx.setTransform(1,0,0,1,0,0);
 
-   ctx.fillStyle = '#FFA500';
+   ctx.fillStyle = '#ff0000';
    ctx.font = scale + 'px Helvetica';
    ctx.fillRect(0,(canvas.height-scale)/2 +(scale/2) +scale,canvas.width,scale);
 
@@ -915,10 +916,11 @@
    ctx.fillText(winnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/3));
    ctx.fillText(text,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale/3));
 
-   ctx.fillStyle = '#ED1C1C';
-
+   ctx.fillStyle = '#ffffff';
    ctx.fillText(priceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale*1.5));
    ctx.font = (scale/1.5) + 'px Microsoft JhengHei';
+
+   ctx.fillStyle = '#ffcc00';
    ctx.fillText(winnerDept,Math.floor(canvas.width/2),Math.floor(canvas.height/3)-scale);
 
    var path = window.location.pathname;

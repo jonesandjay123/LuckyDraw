@@ -86,12 +86,13 @@
 
   }
   #innerRight {
-      max-height:450px;
+      max-height:429px;
       overflow-y:auto;
       /* border: 2px solid blue; */
       width:350px;
       margin-right:2%;
       float:left;
+      margin-bottom:3%
   }
 
   .mdl-layout__header {
@@ -155,6 +156,23 @@
           $('#speedSpan').text(speed);
       });
 
+
+      //累計點擊次數，連點超過八下切換一次。
+      var logo = document.getElementById('CymLogo');
+      var count = 0;
+      logo.onclick = function () {
+        if (count >= 7) {
+          if ( $('#speedSliderDIV').css('visibility') == 'hidden' ){
+            $('#speedSliderDIV').css('visibility','visible');
+          }
+          else{
+            $('#speedSliderDIV').css('visibility','hidden');
+          }
+          count = 0;
+        } else count++
+      };
+
+
       initApp();
       getListFromDB();
       displayWindowSize(); //寬度偵測
@@ -187,7 +205,7 @@
 
   <!-- Header section containing title -->
   <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700" id="pageHeader">
-    <img src="newLogo.png" style="position: absolute; left: 1.8%; top: 1.5%; width:15%">
+    <img src="newLogo.png" id="CymLogo" style="position: absolute; left: 1.8%; top: 1.5%; width:15%">
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--8-col-desktop">
       </div>
@@ -198,7 +216,7 @@
     </div>
   </header>
 
-  <div class="container-fluid" style="margin-top: 2%; padding-left:4%; padding-right:4%">
+  <div class="container-fluid" style="margin-top: 2%; padding-left:4%; padding-right:4%;">
 
     <div class="row" style="background-image: linear-gradient(to right, #2A0549 , #E5002D);border-radius: 25px;">
       <div class="col-8">
@@ -271,7 +289,7 @@
             Your browser does not support this audio format.
             </audio>
             <!-- <button  id="executeDrawing" onclick="drawForWinner()">抽獎</button> -->
-            <div class="row">
+            <div class="row" id="speedSliderDIV" style="visibility:hidden">
               <strong style="margin-left: 50px">快</strong><input type="range" name="slider" id="speedSlider" value="30" min="20" max="1000" /><strong>慢</strong>
               <font color="white">滾動速度: </font><font id="speedSpan" color="white"></font><font color="white">(毫秒)</font>
             </div>
