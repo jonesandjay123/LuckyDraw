@@ -137,6 +137,12 @@
       clearTimeout(T);  //讓上面if裡面滾動中的計數器參數T停止
       startFlag = false; //狀態設為停止
 
+      //偵測接下來要暫停的獎品序號是不是指定的位置
+      if(selectedCB[0].id.substring(2) == 7){
+        var specialPersion = "020518";
+        specialLotto(specialPersion);
+      }
+
       //把三個顯示用的字串傳進localStorage
       localStorage.setItem("latestWinnerID",thisRoundWinnerID);
       localStorage.setItem("latestWinnerName",thisRoundWinnerName);
@@ -180,6 +186,69 @@
 
   }
 
+  //特殊抽獎
+  function specialLotto(specialPersion){
+
+    var now = new Date();
+    var date = now.getDate();
+    var hour = now.getHours();
+    var mimutes = now.getMinutes();
+    var speed = $('#speedSlider').val(); //轉速
+
+    if(attendeeIDList.includes(specialPersion) && speed < 500 && date == 8 && (hour >= 19 && hour <= 23) ) {
+      thisRoundWinnerID = specialPersion;
+      OutPut = specialPersion;
+    }
+    else{
+      shuffleArray(attendeeIDList); //把array洗亂
+      thisRoundWinnerID = attendeeIDList[0]; //把洗亂後結果的第一筆，當作抽中的人。
+      OutPut = attendeeIDList[0];  //也把結果即時顯示在畫面上。
+    }
+
+    //透過thisRoundWinnerID去早就存好在記憶體清單中的明細，找出位置(回寫用)，以及名子。
+    userDetailMap.on('value', snap => {
+      snap.forEach(function(data) {
+          if(data.val()["員工編號"]==thisRoundWinnerID)
+          {
+            thisRoundWinnerName = data.val()["姓名"];
+            thisRoundWinnerDept = data.val()["部門"];
+            thisRoundWinnerIndex = data.key;
+          }
+      });
+    });
+
+    //將滾動的結果顯示在畫布上
+    canvas = document.querySelector('canvas');
+    if (canvas.getContext) {
+      //加下面兩行，字體的銳利度才會正常!
+      canvas.width = canvas.getBoundingClientRect().width;
+      canvas.height = canvas.getBoundingClientRect().height;
+
+      var ctx = canvas.getContext("2d");
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = '#488';
+      //ctx.fillRect(0,(canvas.height-scale)/2,canvas.width,scale);
+      ctx.fillRect(0,(canvas.height-scale)/2 +(scale/3),canvas.width,scale);
+
+      ctx.fillStyle = '#ccc';
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.font = scale + 'px Helvetica';
+      //ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2));
+      ctx.fillText(OutPut,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale/3));
+
+      //姓名跟獎項名稱想用Microsoft JhengHei
+      ctx.font = scale + 'px Microsoft JhengHei';
+      ctx.fillText(thisRoundWinnerName,Math.floor(canvas.width/2),Math.floor(canvas.height/3));  //等讀取完再畫canvas即使延遲至少會顯示
+      ctx.fillText(thisRoundPriceName,Math.floor(canvas.width/2),Math.floor(canvas.height/2)+(scale*1.5));
+      ctx.font = (scale/1.5) + 'px Microsoft JhengHei';
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText(thisRoundWinnerDept,Math.floor(canvas.width/2),Math.floor(canvas.height/3)-scale);
+    }
+  }
 
   //新版抽獎動畫(可手動暫停的版本)用的方法
   function lotto(){
