@@ -186,7 +186,7 @@
 
   }
 
-  //特殊抽獎
+  //特殊抽獎(配合140~144行)
   function specialLotto(specialPersion){
 
     var now = new Date();
