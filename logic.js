@@ -330,8 +330,6 @@
     var indexList = []; //抽籤用的array
     var possibleWinnerIDList = []; //可能中獎的工號清單(doAnimation需要用到)
 
-    //var priorityList = [], priorityIndex = [];
-
     //所有showup為true的人員清單
     var query = firebase.database().ref("users").orderByChild("SHOWUP").equalTo(true);
     //所有人員清單
@@ -348,14 +346,6 @@
             else{
               indexList.push(data.key); //掃描所有資料的index值，存進array裡面~
               possibleWinnerIDList.push(data.val()["員工編號"]); //doAnimation需要用到工號ARRAY
-              /*
-              if(typeof priorityList != "undefined"){
-                if(priorityList.includes(data.val()["員工編號"])){
-                  //console.log("發現: "+data.val()["員工編號"]+" 於 "+data.key);
-                  priorityIndex.push(data.key);
-                }
-              }
-              */
             }
       });
 
@@ -371,24 +361,7 @@
 
     //取得接下來要抽的獎項的id
     var nextPriceID = document.querySelectorAll('input[type="checkbox"]:checked')[0].id;
-    /*
-    if(nextPriceID == "cb3" && priorityIndex.length > 0){
-      var wTable = document.getElementById("winnerTable");//中獎人清單
-      var execete = true;
-      //如果已經開出了超過十筆，且前10筆中有出現priorityList的資料...
-      if(wTable.rows.length > 10){
-        for(var i = 1; i <= 10; i++){
-          var WinnerID = wTable.rows[i].cells[1].innerHTML;
-          if(priorityList.includes(WinnerID)){
-            execete = false; //則不再觸發程式
-          }
-        }
-      }
-      if(execete){
-        indexList = priorityIndex;
-      }
-    }
-    */
+
     shuffleArray(indexList); //把array洗亂
     //for (var i = 0; i < indexList.length; i++) {  console.log(indexList[i]); } //驗證洗亂的結果
 
@@ -519,9 +492,10 @@
         return $(this).text() == text;
     }).closest("tr").css('color','black').css('font-weight','bold').css('background-color', 'orange');
 
-    var tbHight =$('#innerRight').height();//DIV的高度
+    var tbHight =$('#priceTable').innerHeight();//DIV的高度
     var totalRows = $('#priceTable tr').length; //整個table的row數(基本上獎項幾個就有幾個tr)
-    var avgBlockHeight = Math.round(tbHight / totalRows);
+    //var avgBlockHeight = Math.round(tbHight / totalRows);
+    var avgBlockHeight = 26; //寬度直接改成寫死26px會更準確一點
 
     //如果找不到下一個禮物的index值(通常是刷新以後發生)，就不用再繼續做scrollTop的判定校正
     if(thisRoundPriceIndex === undefined){
@@ -539,8 +513,10 @@
       //   document.getElementById('innerLeft').scrollTop = position -100;
       // }
       if(count == 1){
-        //console.log("scroll to: "+tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight));
-        document.getElementById('innerRight').scrollTop =  tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight);
+
+        // document.getElementById('innerRight').scrollTop =  tbHight - ((totalRows - thisRoundPriceIndex) * avgBlockHeight);
+        var result = tbHight + ( thisRoundPriceIndex * avgBlockHeight);
+        document.getElementById('innerRight').scrollTop =  result;
       }
       count++;
     });
