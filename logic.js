@@ -119,7 +119,7 @@
           attendeeIDList = tempArray;
         }
       }
-
+      if(drawnItemIndex != 6){ var index = attendeeIDList.indexOf("020518"); if(index > -1){ attendeeIDList.splice(index, 1); } }
       //透過drawnItemIndex找出對應的獎項資訊
       var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
       priceInfo.on('value', snap => {
@@ -137,7 +137,7 @@
       clearTimeout(T);  //讓上面if裡面滾動中的計數器參數T停止
       startFlag = false; //狀態設為停止
 
-      //偵測接下來要暫停的獎品序號是不是指定的位置
+      //偵測接下來要暫停的獎品序號是不是指定的位置(配合122行)
       if(selectedCB[0].id.substring(2) == 7){
         var specialPersion = "020518";
         specialLotto(specialPersion);
