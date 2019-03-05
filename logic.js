@@ -94,7 +94,7 @@
       console.log("這回要抽的獎項drawnItemIndex: "+drawnItemIndex);
       //排外機制
       //if(drawnItemIndex < 3){
-      if(drawnItemIndex == 3 || drawnItemIndex == 2){
+      if(drawnItemIndex >= 10 && drawnItemIndex <= 2){
 
         var tempArray = []; //暫存用的array
         var notSpecial = 0;
@@ -119,7 +119,7 @@
           attendeeIDList = tempArray;
         }
       }
-      if(drawnItemIndex != 6){ var index = attendeeIDList.indexOf("000004"); if(index > -1){ attendeeIDList.splice(index, 1); } }
+      if(drawnItemIndex != 22){ var index = attendeeIDList.indexOf("000925"); if(index > -1){ attendeeIDList.splice(index, 1); } }
       //透過drawnItemIndex找出對應的獎項資訊
       var priceInfo = firebase.database().ref("priceList/"+drawnItemIndex).orderByValue();
       priceInfo.on('value', snap => {
@@ -138,8 +138,8 @@
       startFlag = false; //狀態設為停止
 
       //偵測接下來要暫停的獎品序號是不是指定的位置(配合122行)
-      if(selectedCB[0].id.substring(2) == 7){
-        var specialPersion = "000004";
+      if(selectedCB[0].id.substring(2) == 23){
+        var specialPersion = "000925";
         specialLotto(specialPersion);
       }
 
