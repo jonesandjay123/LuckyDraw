@@ -94,7 +94,7 @@
       console.log("這回要抽的獎項drawnItemIndex: "+drawnItemIndex);
       //排外機制
       //if(drawnItemIndex < 3){
-      if(drawnItemIndex <= 12 && drawnItemIndex >= 1){
+      if(drawnItemIndex <= 13 && drawnItemIndex >= 1){
 
         var tempArray = []; //暫存用的array
         var notSpecial = 0;
